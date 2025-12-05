@@ -1,3 +1,4 @@
+# Cache bust: 2024-12-06 - force fresh module fetch after tag fix
 manifest:
   remotes:
     - name: zmkfirmware
