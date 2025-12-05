@@ -1,5 +1,32 @@
+name: Build Firmware
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    runs-on: ubuntu-latest
+    container:
+      image: zmkfirmware/zmk-build-arm:stable
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: West Init
+        run: west init -l config
+
+      - name: West Update
+        run: west update
+
+      - name: West Zephyr Export
+        run: west zephyr-export
+
+      - name: West Build
+        run: |
+          west build -s zmk/app -b seeeduino_xiao_ble -- \
+            -DSHIELD=prospector_scanner \
+            -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+
+      - name: Archive Firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: prospector_scanner-seeeduino_xiao_ble-zmk
+          path: build/zephyr/zmk.uf2
