@@ -3,7 +3,7 @@ manifest:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
     - name: prospector
-      url-base: https://github.com/t-ogura
+      url-base: https://github.com/ikedanorihiko
     - name: halfdane
       url-base: https://github.com/halfdane
     - name: ssbb
