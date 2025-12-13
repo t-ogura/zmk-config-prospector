@@ -2,9 +2,11 @@
 include:
   # Scanner mode (non-touch by default)
   # For touch mode: Edit config/prospector_scanner.conf
-  - board: seeeduino_xiao_ble
+  # - board: seeeduino_xiao_ble
+  - board: xiao_ble
     shield: prospector_scanner
 
   # Settings reset utility
-  - board: seeeduino_xiao_ble
+  #- board: seeeduino_xiao_ble
+  - board: xiao_ble
     shield: settings_reset
