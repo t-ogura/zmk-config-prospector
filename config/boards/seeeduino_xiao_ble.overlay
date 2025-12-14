@@ -1,0 +1,41 @@
+/*
+ * Device Tree overlay for APDS9960 sensor support
+ * Only used when CONFIG_PROSPECTOR_USE_AMBIENT_LIGHT_SENSOR=y
+ */
+
+
+// I2C0 configuration for ambient light sensor
+&i2c0 {
+    compatible = "nordic,nrf-twim";
+    status = "okay";
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
+    clock-frequency = <I2C_BITRATE_STANDARD>;
+
+    // APDS9960 ambient light sensor
+    apds9960: apds9960@39 {
+        compatible = "avago,apds9960";
+        reg = <0x39>;
+        status = "okay";
+        int-gpios = <&gpio0 28 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; // D2 = P0.28
+    };
+};
+
+// Required pinctrl configurations
+&pinctrl {
+    i2c0_default: i2c0_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 4)>,  // Pin 4 (D4) = P0.04 = SDA
+                    <NRF_PSEL(TWIM_SCL, 0, 5)>;  // Pin 5 (D5) = P0.05 = SCL
+        };
+    };
+
+    i2c0_sleep: i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 4)>,  // Pin 4 (D4) = P0.04 = SDA
+                    <NRF_PSEL(TWIM_SCL, 0, 5)>;  // Pin 5 (D5) = P0.05 = SCL
+            low-power-enable;
+        };
+    };
+};
