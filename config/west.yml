@@ -11,7 +11,7 @@ manifest:
       import: app/west.yml
     - name: prospector-zmk-module
       remote: prospector
-      revision: v2.0.0
+      revision: fix/zephyr4-boot-restoration
       path: modules/prospector-zmk-module
   self:
     path: config
