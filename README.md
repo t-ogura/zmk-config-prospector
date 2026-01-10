@@ -1,5 +1,7 @@
 # Prospector Scanner - ZMK Status Display Device
 
+> ⚠️ **Dev build v2.1a available**: Pre-release with Zephyr 4.1 support and fixes for modifier key display and USB connection indicator bugs. Try it before the official release → [v2.1a tag](https://github.com/t-ogura/zmk-config-prospector/releases/tag/v2.1a)
+
 > 🎉 **NEW: v2.0.0 "Touch & Precision" Released! (November 20, 2025)**
 >
 > **🎯 TOUCH PANEL SUPPORT**: Optional CST816S touch integration with swipe gestures
