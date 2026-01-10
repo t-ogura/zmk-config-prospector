@@ -1,9 +1,15 @@
 ---
 include:
-  # Scanner mode (non-touch by default)
-  # For touch mode: Edit config/prospector_scanner.conf
+  # Scanner - Non-Touch Mode (display only, no swipe navigation)
   - board: xiao_ble/nrf52840
     shield: prospector_scanner
+    artifact-name: prospector_scanner
+
+  # Scanner - Touch Mode (swipe navigation + settings screens)
+  - board: xiao_ble/nrf52840
+    shield: prospector_scanner
+    cmake-args: -DEXTRA_CONF_FILE=prospector_scanner_touch.conf
+    artifact-name: prospector_scanner_touch
 
   # Settings reset utility
   - board: xiao_ble/nrf52840
