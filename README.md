@@ -1,6 +1,14 @@
 # Prospector Scanner - ZMK Status Display Device
 
-> ⚠️ **Dev build v2.1a available**: Pre-release with Zephyr 4.1 support and fixes for modifier key display and USB connection indicator bugs. Try it before the official release → [v2.1a tag](https://github.com/t-ogura/zmk-config-prospector/releases/tag/v2.1a)
+> 🚀 **PRE-RELEASE: v2.1b Available! (January 2026)**
+>
+> **🎡 LAYER SLIDE MODE**: Animated dial-style layer display with smooth transitions
+>
+> **📡 RX Hz FIX**: Stable signal reception rate display with moving average
+>
+> **🔋 PERIPHERAL MAPPING**: Configure battery slot assignment for multi-peripheral setups
+>
+> 👉 Use `revision: v2.1b` in west.yml (pre-release, full release coming as v2.1.0)
 
 > 🎉 **NEW: v2.0.0 "Touch & Precision" Released! (November 20, 2025)**
 >
