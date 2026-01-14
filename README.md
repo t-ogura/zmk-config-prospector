@@ -1,6 +1,20 @@
 # Prospector Scanner - ZMK Status Display Device
 
-> 🎉 **NEW: v2.0.0 "Touch & Precision" Released! (November 20, 2025)**
+> 🚀 **PRE-RELEASE: v2.1b Available! (January 2026)**
+>
+> **🎡 LAYER SLIDE MODE**: Animated dial-style layer display with smooth transitions
+>
+> **📡 RX Hz FIX**: Stable signal reception rate display with moving average
+>
+> **🔋 PERIPHERAL MAPPING**: Configure battery slot assignment for multi-peripheral setups
+>
+> **⚡ DYNAMIC BATTERY**: Improved keyboard switching with animated indicators
+>
+> 👉 Use `revision: v2.1b` in west.yml (pre-release, full release coming as v2.1.0)
+
+---
+
+> 🎉 **STABLE: v2.0.0 "Touch & Precision" (November 2025)**
 >
 > **🎯 TOUCH PANEL SUPPORT**: Optional CST816S touch integration with swipe gestures
 >
@@ -13,7 +27,7 @@
 > 👉 **[See complete v2.0 release notes →](docs/RELEASES/v2.0.0/release_notes.md)**
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v2.0.0-brightgreen" alt="Version 2.0.0 Touch & Precision">
+  <img src="https://img.shields.io/badge/version-v2.1b--prerelease-yellow" alt="Version 2.1b Pre-release">
   <img src="https://img.shields.io/badge/status-production%20ready-brightgreen" alt="Production Ready">
   <img src="https://img.shields.io/badge/ZMK-compatible-blue" alt="ZMK Compatible">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
