@@ -9,6 +9,8 @@
 > **🔋 PERIPHERAL MAPPING**: Configure battery slot assignment for multi-peripheral setups
 >
 > 👉 Use `revision: v2.1b` in west.yml (pre-release, full release coming as v2.1.0)
+>
+> 📦 **[Download pre-built firmware →](https://github.com/t-ogura/zmk-config-prospector/actions/runs/20990385693)** (Artifacts section)
 
 > 🎉 **NEW: v2.0.0 "Touch & Precision" Released! (November 20, 2025)**
 >
