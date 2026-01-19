@@ -301,14 +301,11 @@ Add to your keyboard's `.conf` file:
 CONFIG_ZMK_STATUS_ADVERTISEMENT=y
 CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME="MyKeyboard"
 
-# Power optimization (10Hz active, 0.03Hz idle)
-CONFIG_ZMK_STATUS_ADV_ACTIVITY_BASED=y
-CONFIG_ZMK_STATUS_ADV_ACTIVE_INTERVAL_MS=100
-CONFIG_ZMK_STATUS_ADV_IDLE_INTERVAL_MS=30000
-
-# Split keyboard battery monitoring (if applicable)
+# Split keyboard only: enable peripheral battery fetching
 CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING=y
 ```
+
+That's it! Power optimization is enabled by default (5Hz active, 0.03Hz idle).
 
 Rebuild and flash your keyboard firmware.
 
@@ -870,11 +867,11 @@ That's it! Your keyboard will broadcast status at default intervals.
 CONFIG_ZMK_STATUS_ADVERTISEMENT=y
 CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME="MyKeyboard"  # Shown on scanner (max 8 chars)
 
-# ===== POWER OPTIMIZATION =====
-CONFIG_ZMK_STATUS_ADV_ACTIVITY_BASED=y            # Enable activity-based intervals
-CONFIG_ZMK_STATUS_ADV_ACTIVE_INTERVAL_MS=100      # 10Hz when typing
-CONFIG_ZMK_STATUS_ADV_IDLE_INTERVAL_MS=30000      # 0.03Hz when idle (30s)
-CONFIG_ZMK_STATUS_ADV_ACTIVITY_TIMEOUT_MS=5000    # 5s before switching to idle
+# ===== POWER OPTIMIZATION (all have sensible defaults) =====
+# CONFIG_ZMK_STATUS_ADV_ACTIVITY_BASED=y          # Default: y (enabled)
+# CONFIG_ZMK_STATUS_ADV_ACTIVE_INTERVAL_MS=200    # Default: 200 (5Hz when typing)
+# CONFIG_ZMK_STATUS_ADV_IDLE_INTERVAL_MS=30000    # Default: 30000 (0.03Hz when idle)
+# CONFIG_ZMK_STATUS_ADV_ACTIVITY_TIMEOUT_MS=10000 # Default: 10000 (10s before idle)
 
 # ===== SPLIT KEYBOARD =====
 CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING=y  # Fetch peripheral battery
