@@ -1,53 +1,86 @@
 # Prospector Scanner v2.1.0 "Zephyr 4.x Ready"
 
 **Release Date**: January 2026
-**Status**: ✅ **Production Ready** - Compatibility & Stability Release
-**Version Type**: Minor version with Zephyr 4.x compatibility and stability improvements
+**Status**: ✅ **Production Ready** - Major Feature & Compatibility Release
+**Version Type**: Minor version with Zephyr 4.x compatibility, new features, and stability improvements
 
 ## 🌟 Release Highlights
 
-v2.1.0 brings **Zephyr 4.x / ZMK main branch compatibility** along with significant stability improvements, latency optimizations, and bug fixes discovered during the migration process.
+v2.1.0 brings **Zephyr 4.x / ZMK main branch compatibility** along with major new features including dynamic battery display, channel filtering, layer slide mode, and Pong Wars screensaver.
 
-### 🏆 **Key Changes**
+### 🏆 **Major New Features**
 
-#### **1. Zephyr 4.x Compatibility** 🔧
+#### **1. Dynamic Battery Display** 🔋
+- **Adaptive Layout**: Automatically adjusts to 1-4 keyboards
+- **Smart Labels**:
+  - 1 keyboard: No label (wide bar)
+  - 2 keyboards: L / R
+  - 3 keyboards: L / R / Aux
+  - 4 keyboards: L / R / A1 / A2
+- **Wider Single Bar**: 165px width (1.5x) for single keyboard
+
+#### **2. Channel Feature** 📡
+- **Keyboard Side**: `CONFIG_PROSPECTOR_CHANNEL` (0=broadcast, 1-255=specific)
+- **Scanner Side**: Channel filter in keyboard list screen
+- **Use Case**: Filter specific keyboards in multi-keyboard environments
+- **Badge Display**: Shows channel number on keyboard list
+
+#### **3. Layer Slide Mode** 🎡
+- **Dial-Style Animation**: Active layer slides to center position
+- **Direction-Based**: Animates based on layer change direction
+- **Config Option**: `CONFIG_PROSPECTOR_LAYER_SLIDE_DEFAULT=y`
+- **Touch Toggle**: Change mode via Display Settings (touch mode)
+
+#### **4. Over-Max Layer Display** 🔢
+- **Large Number Mode**: Layers >= max_layers show single large digit
+- **Slide Animations**:
+  - Layer increase: slides from right
+  - Layer decrease: slides from left
+- **Smooth Transitions**: Between list mode and over-max mode
+
+#### **5. Peripheral Battery Slot Mapping** 🔄
+- **Configurable Slots**: Remap peripheral indices to display slots
+- **Config Options**:
+  - `CONFIG_ZMK_STATUS_ADV_HALF_PERIPHERAL` (default: 0)
+  - `CONFIG_ZMK_STATUS_ADV_AUX1_PERIPHERAL` (default: 1)
+  - `CONFIG_ZMK_STATUS_ADV_AUX2_PERIPHERAL` (default: 2)
+- **Use Case**: When connection order doesn't match physical layout
+
+#### **6. Pong Wars Screensaver** 🎮 *(Touch Mode)*
+- **Visual Entertainment**: Two-color balls paint the screen
+- **Access**: LEFT swipe → System Settings → Pong Wars
+- **Auto-Stop**: Returns to main screen on any touch
+
+#### **7. Zephyr 4.x Compatibility** 🔧
 - **Board Name Change**: `seeeduino_xiao_ble` → `xiao_ble/nrf52840`
 - **LVGL 9 Migration**: Updated for new LVGL API
-- **API Updates**: Adapted to Zephyr 4.x breaking changes
+- **Extended Advertising**: Native `BT_EXT_ADV` support
 - **ZMK Main Branch**: Full compatibility with latest ZMK
 
-**Build Command (New)**:
-```bash
-west build -b xiao_ble/nrf52840 -s zmk/app -- \
-  -DSHIELD=prospector_scanner \
-  -DZMK_CONFIG="$(pwd)/config"
-```
+### 🏗️ **Improvements**
 
-#### **2. Latency Optimization** ⚡
-- **Faster Display Updates**: Optimized work queue scheduling
-- **Reduced Input Lag**: Improved response to keyboard status changes
-- **Sub-second Updates**: Near-instant layer and modifier display
+#### **Latency Optimization** ⚡
+- **Faster Display Updates**: Optimized work queue scheduling (~50ms vs ~200ms)
+- **RX Hz Calculation Fix**: Moving average (4 samples) for stable display
+- **Atomic Counters**: Proper BLE advertisement counting
 
-#### **3. Layer Display Improvements** 🔢
+#### **Layer Display** 🔢
 - **Removed Layer 15 Limit**: Now supports any layer number (0-255)
-- **Layer Slide Mode**: Optional dial-style animated display
 - **10+ Layer Support**: Better handling of complex keyboard layouts
 
-#### **4. Sleep/Wake Recovery** 💤
-- **Improved Advertising Recovery**: Keyboard reconnects faster after PC sleep
+#### **Sleep/Wake Recovery** 💤
 - **Activity State Listener**: Proper cleanup on sleep entry
+- **Improved Advertising Recovery**: Keyboard reconnects faster after PC sleep
 - **Error Retry Logic**: 3 retries before advertising reset
 
-### 🏗️ **Architecture Improvements**
-
-#### **Extended Advertising Support** 📡
-- **Scan Response Handling**: Fixed `BT_LE_ADV_OPT_SCANNABLE` flag usage
-- **Device Identity**: Added `USE_IDENTITY` for consistent OS device listing
+#### **Extended Advertising** 📡
+- **Scan Response Handling**: Fixed `BT_LE_ADV_OPT_SCANNABLE` flag
+- **Device Identity**: `USE_IDENTITY` for consistent OS device listing
 - **Burst Mode Fixes**: Resolved "Unknown" device name issues
 
-#### **Timeout Feature Improvements** ⏱️
+#### **Timeout Feature** ⏱️
 - **0 = Disabled**: Setting timeout to 0 now properly disables the feature
-- **"Scanning..." Restoration**: Screen correctly returns to scanning state when keyboards timeout
+- **"Scanning..." Restoration**: Screen correctly returns to scanning state
 - **Timeout Brightness**: Proper brightness reduction on timeout
 
 ## 📊 Version Comparison
@@ -56,10 +89,15 @@ west build -b xiao_ble/nrf52840 -s zmk/app -- \
 |---------|--------|--------|-------------|
 | **ZMK Version** | ZMK ≤0.3 (Zephyr 3.x) | ZMK main (Zephyr 4.x) | ✅ Latest ZMK |
 | **Board Name** | `seeeduino_xiao_ble` | `xiao_ble/nrf52840` | ✅ New naming |
+| **Battery Display** | Fixed layout | Dynamic 1-4 keyboards | ✅ Adaptive |
 | **Layer Limit** | 0-15 | 0-255 | ✅ No limit |
+| **Layer Animation** | Static list only | Slide mode option | ✅ Animated |
+| **Channel Filter** | Not supported | Keyboard & scanner | ✅ New feature |
 | **Display Latency** | ~200ms | ~50ms | ✅ 4x faster |
+| **RX Hz Display** | Unstable/garbage | Moving average | ✅ Stable |
 | **Sleep Recovery** | Manual workaround | Automatic | ✅ Reliable |
-| **Timeout 0** | Not working | Properly disabled | ✅ Fixed |
+| **Peripheral Mapping** | Hardcoded | Configurable | ✅ Flexible |
+| **Screensaver** | None | Pong Wars | ✅ Fun! |
 
 ## 🔧 Bug Fixes
 
@@ -67,6 +105,8 @@ west build -b xiao_ble/nrf52840 -s zmk/app -- \
 1. ✅ **Layer 15 Limit**: Removed artificial limitation in advertisement parsing
 2. ✅ **"Unknown" Device Name**: Fixed burst advertising causing name loss
 3. ✅ **Timeout Screen**: Properly returns to "Scanning..." when keyboards timeout
+4. ✅ **RX Hz Garbage Values**: Fixed float corruption on ARM with int32 storage
+5. ✅ **Widget Update on Wrong Screen**: Prevent layer updates on non-main screens
 
 ### **BLE & Connectivity**
 1. ✅ **Extended Advertising**: Proper scan response flag handling
@@ -82,6 +122,27 @@ west build -b xiao_ble/nrf52840 -s zmk/app -- \
 1. ✅ **Timeout 0 = Disabled**: Setting works correctly now
 2. ✅ **Timeout Brightness**: Proper application on keyboard timeout
 
+## 📋 New Configuration Options
+
+### Keyboard Side (status_advertisement)
+
+```conf
+# Channel broadcasting (0 = all scanners, 1-255 = specific channel)
+CONFIG_PROSPECTOR_CHANNEL=0
+
+# Peripheral battery slot mapping (for split keyboards)
+CONFIG_ZMK_STATUS_ADV_HALF_PERIPHERAL=0   # Keyboard half slot
+CONFIG_ZMK_STATUS_ADV_AUX1_PERIPHERAL=1   # Aux1 (e.g., trackball)
+CONFIG_ZMK_STATUS_ADV_AUX2_PERIPHERAL=2   # Aux2 (e.g., numpad)
+```
+
+### Scanner Side
+
+```conf
+# Layer slide animation mode (works in both touch and non-touch)
+CONFIG_PROSPECTOR_LAYER_SLIDE_DEFAULT=y
+```
+
 ## 🛠️ Hardware Requirements
 
 No hardware changes from v2.0.0 - same components work with both versions.
@@ -92,24 +153,6 @@ No hardware changes from v2.0.0 - same components work with both versions.
 - **Optional**: APDS9960 ambient light sensor
 - **Optional**: LiPo battery for portable operation
 - **Optional**: CST816S touch panel (Touch Mode)
-
-## 📋 Configuration Changes
-
-### Build Command Update
-
-**Old (Zephyr 3.x / ZMK ≤0.3)**:
-```bash
-west build -b seeeduino_xiao_ble -s zmk/app -- ...
-```
-
-**New (Zephyr 4.x / ZMK main)**:
-```bash
-west build -b xiao_ble/nrf52840 -s zmk/app -- ...
-```
-
-### No Configuration File Changes Required
-
-`prospector_scanner.conf` remains compatible - no changes needed.
 
 ## 🔄 Migration Guide
 
@@ -169,10 +212,11 @@ The BLE advertisement protocol is unchanged - only the Zephyr/ZMK version differ
 1. **Board Name**: Must use `xiao_ble/nrf52840` (old name won't work)
 2. **West Update**: Required after changing west.yml
 
-### General (Same as v2.0.0)
+### General
 1. **Multi-Keyboard Limit**: Maximum 5 keyboards
 2. **Settings Persistence**: Touch mode settings not persistent across reboots
 3. **Sleep/Wake**: First keypress wakes MCU; second press may be needed for faster reconnection
+4. **Channel Feature**: Requires keyboard firmware update to use channel broadcasting
 
 ## 🧹 Cleanup
 
@@ -188,8 +232,9 @@ The BLE advertisement protocol is unchanged - only the Zephyr/ZMK version differ
 
 ## 📈 Statistics
 
-- **Commits**: 17 commits from v2.1b to v2.1c
-- **Files Changed**: 10+ source files updated
+- **Commits**: 30+ commits from v2.0.0
+- **Files Changed**: 15+ source files updated
+- **New Features**: 7 major features
 - **Build Size**: ~920KB (touch mode), ~900KB (non-touch)
 
 ## 🙏 Acknowledgments
@@ -201,6 +246,7 @@ The BLE advertisement protocol is unchanged - only the Zephyr/ZMK version differ
 ### Community
 - Users who reported sleep/wake issues
 - Testers who verified Zephyr 4.x compatibility
+- Feature requests for channel filtering and dynamic battery display
 
 ---
 
