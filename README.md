@@ -294,7 +294,30 @@ GND → GND
 
 ### Step 4: Configure Keyboard
 
-Add to your keyboard's `.conf` file:
+#### 4a. Add module to your keyboard's `config/west.yml`:
+
+```yaml
+manifest:
+  remotes:
+    - name: zmkfirmware
+      url-base: https://github.com/zmkfirmware
+    - name: prospector
+      url-base: https://github.com/t-ogura
+
+  projects:
+    - name: zmk
+      remote: zmkfirmware
+      revision: main
+      import: app/west.yml
+
+    # Add this:
+    - name: prospector-zmk-module
+      remote: prospector
+      revision: v2.1.0  # Use v2.0.0 for ZMK ≤0.3 (Zephyr 3.x)
+      path: modules/prospector-zmk-module
+```
+
+#### 4b. Add to your keyboard's `.conf` file:
 
 ```conf
 # Enable status advertisement
@@ -305,9 +328,13 @@ CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME="MyKeyboard"
 CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING=y
 ```
 
-That's it! Power optimization is enabled by default (5Hz active, 0.03Hz idle).
+#### 4c. Rebuild and flash:
 
-Rebuild and flash your keyboard firmware.
+```bash
+west update
+west build -b your_board -- -DSHIELD=your_shield
+# Copy .uf2 to bootloader drive
+```
 
 ### Step 5: Test
 
