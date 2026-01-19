@@ -464,6 +464,61 @@ CONFIG_PROSPECTOR_MAX_LAYERS=7        # Range: 4-10
 
 **Match your keyboard**: Set this to match your keyboard's layer count for best appearance. If your keyboard has 5 layers, set to 5 for optimal spacing.
 
+### Layer Slide Mode (v2.1 New)
+
+```conf
+# Enable dial-style animated layer display
+CONFIG_PROSPECTOR_LAYER_SLIDE_DEFAULT=y
+```
+
+**What it does**: Active layer slides to center position with smooth animation. Layer changes animate based on direction (increase = slide from right, decrease = slide from left).
+
+**Over-max behavior**: When layer exceeds `MAX_LAYERS`, displays a single large number instead of the layer list.
+
+**Touch mode**: Can be toggled via Display Settings screen.
+
+### Channel Feature (v2.1 New)
+
+Channels allow filtering specific keyboards in multi-keyboard environments.
+
+#### Scanner Side (config/prospector_scanner.conf)
+
+Channel filtering is configured at runtime via the keyboard list screen (touch mode) or defaults to receiving all channels.
+
+#### Keyboard Side (your keyboard's .conf)
+
+```conf
+# Channel broadcasting (add to your keyboard config)
+CONFIG_PROSPECTOR_CHANNEL=0    # 0 = broadcast to all scanners (default)
+                                # 1-255 = specific channel
+```
+
+**Use case examples**:
+- **Home/Office separation**: Home keyboards on channel 1, office on channel 2
+- **Multi-user**: Each user's keyboards on different channels
+- **Testing**: Isolate test keyboards from production display
+
+**Important**: Both keyboard AND scanner need v2.1.0+ for channel filtering to work.
+
+### Peripheral Battery Slot Mapping (v2.1 New)
+
+For split keyboards with multiple peripherals (e.g., keyboard half + trackball), you can remap which peripheral appears in which display slot.
+
+```conf
+# Add to your keyboard's .conf file
+CONFIG_ZMK_STATUS_ADV_HALF_PERIPHERAL=0   # Keyboard half slot (default: 0)
+CONFIG_ZMK_STATUS_ADV_AUX1_PERIPHERAL=1   # Aux1 slot, e.g., trackball (default: 1)
+CONFIG_ZMK_STATUS_ADV_AUX2_PERIPHERAL=2   # Aux2 slot, e.g., numpad (default: 2)
+```
+
+**When to use**: After `settings_reset`, peripherals may reconnect in different order than expected. Use these settings to fix the display order without re-pairing.
+
+**Example**: If your trackball (should be Aux1) connected before keyboard half:
+```conf
+CONFIG_ZMK_STATUS_ADV_HALF_PERIPHERAL=1   # Keyboard half is now index 1
+CONFIG_ZMK_STATUS_ADV_AUX1_PERIPHERAL=0   # Trackball is now index 0
+```
+
 ### Brightness Control
 
 #### Fixed Brightness (Simple)
@@ -563,6 +618,9 @@ CONFIG_DISPLAY=y
 CONFIG_LVGL=y
 CONFIG_PROSPECTOR_MAX_LAYERS=7
 
+# ===== LAYER DISPLAY (v2.1) =====
+# CONFIG_PROSPECTOR_LAYER_SLIDE_DEFAULT=y  # Enable slide animation mode
+
 # ===== BRIGHTNESS =====
 # Option 1: Fixed brightness (simple)
 CONFIG_PROSPECTOR_USE_AMBIENT_LIGHT_SENSOR=n
@@ -587,6 +645,8 @@ CONFIG_PROSPECTOR_BATTERY_SUPPORT=n  # Enable if LiPo connected
 ```
 
 Copy this template and customize for your needs.
+
+**For keyboard-side v2.1 features** (channel, peripheral mapping), see [Keyboard Integration](#keyboard-integration) section.
 
 ---
 
@@ -877,16 +937,19 @@ CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME="MyKeyboard"  # Shown on scanner (max 8 char
 CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING=y  # Fetch peripheral battery
 CONFIG_ZMK_STATUS_ADV_CENTRAL_SIDE="RIGHT"        # Which side is central (LEFT/RIGHT)
 
-# Peripheral battery slot mapping (for multi-peripheral setups)
-CONFIG_ZMK_STATUS_ADV_HALF_PERIPHERAL=0           # Keyboard half slot (default: 0)
-CONFIG_ZMK_STATUS_ADV_AUX1_PERIPHERAL=1           # Aux1 slot - e.g., trackball
-CONFIG_ZMK_STATUS_ADV_AUX2_PERIPHERAL=2           # Aux2 slot - e.g., numpad
+# ===== PERIPHERAL BATTERY MAPPING (v2.1, for multi-peripheral setups) =====
+# Use when connection order doesn't match physical layout (e.g., after settings_reset)
+# CONFIG_ZMK_STATUS_ADV_HALF_PERIPHERAL=0         # Keyboard half slot (default: 0)
+# CONFIG_ZMK_STATUS_ADV_AUX1_PERIPHERAL=1         # Aux1 slot - e.g., trackball (default: 1)
+# CONFIG_ZMK_STATUS_ADV_AUX2_PERIPHERAL=2         # Aux2 slot - e.g., numpad (default: 2)
 
 # ===== WPM TRACKING =====
 CONFIG_ZMK_STATUS_ADV_WPM_WINDOW_SECONDS=30       # WPM calculation window (5-120s)
 
-# ===== CHANNEL (optional) =====
-# CONFIG_PROSPECTOR_CHANNEL=0                     # 0=broadcast to all, 1-255=specific channel
+# ===== CHANNEL (v2.1, optional) =====
+# For multi-keyboard environments - filter by channel on scanner side
+# CONFIG_PROSPECTOR_CHANNEL=0                     # 0=broadcast to all (default)
+# CONFIG_PROSPECTOR_CHANNEL=1                     # 1-255=specific channel
 ```
 
 ### Step 3: Rebuild Keyboard Firmware
