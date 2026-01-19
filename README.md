@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
 </p>
 
-**Latest**: [v2.1.0 Release Notes](docs/RELEASES/v2.1.0.md)
+**Latest**: [v2.1.0 Release Notes](docs/RELEASES/v2.1.0/release_notes.md)
 
 ---
 
@@ -139,10 +139,10 @@ See [Touch Mode Guide](docs/TOUCH_MODE.md) for touch configuration.
 ### 🎯 **Touch Panel Support** (v2.0 New)
 - **Optional CST816S Touch**: Enable with `CONFIG_PROSPECTOR_TOUCH_ENABLED=y`
 - **4-Direction Swipe Gestures**: Navigate settings screens intuitively
-- **Display Settings Screen**: Adjust brightness, auto-brightness on/off via touch slider
-- **System Settings Screen**: Future expansion for advanced configuration
+- **On-Device Settings**: Adjust max layers, channel filter, and more via touch
 - **Thread-Safe LVGL**: Complete freeze elimination with mutex protection
-- **Dynamic Memory**: Widgets created on-demand, destroyed when not needed
+
+👉 **[Touch Mode Guide →](docs/TOUCH_MODE.md)** for complete setup and screen descriptions
 
 ### 🌞 **Adaptive Brightness** (v1.1+)
 - **APDS9960 Integration**: Ambient light sensor with 4-pin mode (no interrupt required)
@@ -226,8 +226,8 @@ Touch mode requires:
    - Click completed workflow run
    - Scroll to "Artifacts" section
    - Download:
-     - `prospector_scanner` - Non-touch mode
-     - `prospector_scanner_touch` - Touch mode ([Touch Mode Guide](docs/TOUCH_MODE.md))
+     - `prospector_scanner` - Non-touch mode (this guide)
+     - `prospector_scanner_touch` - Touch mode (see [Touch Mode Guide](docs/TOUCH_MODE.md))
    - Extract and flash the `.uf2` file
 
 #### Option B: Local Build
@@ -506,7 +506,7 @@ CONFIG_PROSPECTOR_LAYER_SLIDE_DEFAULT=y
 
 **Over-max behavior**: When layer exceeds `MAX_LAYERS`, displays a single large number instead of the layer list.
 
-**Touch mode**: Can be toggled via Display Settings screen.
+**Touch mode**: Can be toggled on-device. See **[Touch Mode Guide](docs/TOUCH_MODE.md)** for details.
 
 ### Channel Feature (v1.1.2+)
 
@@ -523,7 +523,7 @@ CONFIG_PROSPECTOR_CHANNEL=0    # 0 = broadcast to all scanners (default)
 
 #### Scanner Side (config/prospector_scanner.conf)
 
-**Touch mode**: Channel can be changed dynamically via keyboard list screen (tap channel badge). Supports 0-9.
+**Touch mode**: Channel can be changed dynamically on-device. See **[Touch Mode Guide](docs/TOUCH_MODE.md)**.
 
 **Non-touch mode**: Set channel via Kconfig:
 ```conf
@@ -823,97 +823,35 @@ The keyboard adjusts broadcast frequency based on activity to save battery:
 
 ## 🎨 Display Features
 
-### Widget Layout (v2.0)
+### Main Screen
 
-```
-┌─────────────────────────────┐
-│ MyKeyboard            🔋 85%│ ← Device name (left), Scanner battery (right, v1.1+)
-│ > USB                 [P0] │ ← Connection status (left: > USB or BLE icon, right: profile)
-│                             │
-│ WPM                    RX   │ ← WPM (left), Signal info (right)
-│ 045             -45dBm 1.0Hz│   (RSSI + reception rate)
-│                             │
-│          Layer              │ ← Layer title
-│    0  1  2  3  4  5  6      │ ← Pastel colored layer indicators (0-15 supported)
-│                             │
-│        󰘴  󰘶  󰘵              │ ← Modifier key indicators (NerdFont icons)
-│                             │   󰘴=Ctrl, 󰘵=Shift, 󰘶=Alt, =GUI
-│                             │
-│    ████████████ 85%         │ ← Keyboard battery (main/central)
-│    ████████████ 78%         │ ← Split keyboard peripheral battery (if applicable)
-└─────────────────────────────┘
-```
+<img src="docs/images/display.jpg" alt="Main Screen Display" width="400">
 
-### Visual Elements
+| No. | Element | Description |
+|:---:|---------|-------------|
+| ① | **Keyboard Name** | Keyboard name configured via `CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME` |
+| ② | **WPM** | Words Per Minute - typing speed (5 characters = 1 word) |
+| ③ | **Connection Profile** | BLE connection status. **Colors**: White = Waiting, Blue = Communicating, Green = Connected. **Number** (0-4): Active BLE profile |
+| ④ | **Layer** | Current active layer index with pastel color coding |
+| ⑤ | **Modifier Keys** | Active modifier keys displayed when held (Ctrl, Shift, Alt, Cmd/Win) |
+| ⑥ | **Battery Level** | Battery bars with percentage. Split keyboards: L = Peripheral, R = Central |
+| ⑦ | **Communication Status** | RX signal strength (dBm) and reception frequency (Hz) |
 
-#### Battery Color Coding (5-Level System)
+**Note**: Scanner's own battery (if LiPo connected) appears at top-right corner.
 
-Battery bars use color-coded indicators for quick status recognition:
-
-| Range | Color | Hex Code | Visual |
-|-------|-------|----------|--------|
-| **80-100%** | Green | `#00CC66` | 🟢 Full/Healthy |
-| **60-79%** | Light Green | `#66CC00` | 🟢 Good |
-| **40-59%** | Yellow | `#FFCC00` | 🟡 Medium |
-| **20-39%** | Orange | `#FF9900` | 🟠 Low |
-| **0-19%** | Red | `#FF3333` | 🔴 Critical |
-
-#### Layer Display
-
-- **Pastel Colors**: 7-15 unique pastel colors for different layers
-- **Configurable Count**: Adjust max layers via `CONFIG_PROSPECTOR_MAX_LAYERS` (default: 7)
-- **Dynamic Centering**: Automatically adjusts spacing based on layer count
-  - 4 layers = wide spacing
-  - 10 layers = tight fit
-  - Always perfectly centered
-- **Active Indicator**: Current layer highlighted with brighter color
-
-#### Connection Status
-
-- **USB Mode**: Shows "> USB" text (v2.0 fix for Issue #5)
-- **BLE Mode**: Shows Bluetooth icon
-- **Profile**: Displays active BLE profile `[P0]` - `[P4]`
-
-#### WPM Display (Words Per Minute)
-
-- **Real-time Calculation**: Updates during typing with decay algorithm
-- **3-Digit Format**: `000` - `255` WPM
-- **Idle Decay**: Gradually decreases when typing stops
-- **Window**: Configurable (10s/30s/60s) via `CONFIG_ZMK_STATUS_ADV_WPM_WINDOW_SECONDS`
-
-#### Signal Status (Bottom Right)
-
-- **RSSI**: Signal strength in dBm (e.g., `-45dBm` = excellent, `-80dBm` = weak)
-- **Reception Rate**: Update frequency in Hz (e.g., `10Hz` = active typing, `0.03Hz` = idle)
-
-#### Scanner Battery (Top Right, v1.1+)
-
-- **Display**: Shows scanner's own battery level `🔋 85%`
-- **Charging Indicator**: Icon changes when USB charging
-- **Optional**: Only shown when `CONFIG_PROSPECTOR_BATTERY_SUPPORT=y`
-
-### Display Brightness (v2.0)
+### Display Brightness
 
 #### Auto-Brightness (APDS9960 Sensor)
 
-- **Sensor**: APDS9960 ambient light sensor (4-pin mode, no interrupt)
-- **Non-linear Response**: Maps sensor values to comfortable brightness levels
-- **Smooth Transitions**: Configurable fade (default: 800ms, 12 steps)
-- **USB/Battery Profiles**: Different max brightness for each power source
-- **Activity-Based Dimming**: Auto-dim to 5% after timeout (configurable)
-
-#### Manual Brightness (Touch Mode)
-
-- **Swipe Gesture**: Swipe DOWN to access Display Settings
-- **Slider Control**: Adjust brightness 0-100% via touch slider
-- **Persistent**: Settings saved to flash memory
-- **Auto-Brightness Toggle**: Enable/disable sensor control on-device
+- **Hardware**: APDS9960 ambient light sensor (4-pin mode, no interrupt needed)
+- **Behavior**: Smooth fade transitions (800ms, 12 steps)
+- **Range**: 20-100% based on ambient light
 
 #### Timeout Dimming (v2.0)
 
 - **Automatic**: Dims to 5% when no keyboard activity detected
-- **Configurable Timeout**: Set via `CONFIG_PROSPECTOR_SCANNER_TIMEOUT_MS` (default: 8 minutes)
-- **Wake on Activity**: Returns to normal brightness when keyboard activity resumes
+- **Configurable**: `CONFIG_PROSPECTOR_SCANNER_TIMEOUT_MS` (default: 8 minutes, 0=disabled)
+- **Wake on Activity**: Returns to normal brightness when keyboard sends data
 
 ---
 
@@ -1019,10 +957,10 @@ west build -b your_board -- -DSHIELD=your_shield
 ## Documentation
 
 ### Guides
-- **[Touch Mode Guide](docs/TOUCH_MODE.md)** - Complete touch panel setup and usage
+- **[Touch Mode Guide](docs/TOUCH_MODE.md)** - Touch panel setup, screen navigation, UI element descriptions
 
 ### Release History
-- **[v2.1.0](docs/RELEASES/v2.1.0.md)** (2026-01): Zephyr 4.x, improved responsiveness, layer slide mode
+- **[v2.1.0](docs/RELEASES/v2.1.0/release_notes.md)** (2026-01): Zephyr 4.x, improved responsiveness, layer slide mode
 - **[v2.0.0](docs/RELEASES/v2.0.0/release_notes.md)** (2025-11): Touch support, USB display fix, thread safety
 - **v1.1.x** (2025-08): Ambient light sensor, power optimization
 - **v1.0.0** (2025-08): Initial release with YADS-style UI
