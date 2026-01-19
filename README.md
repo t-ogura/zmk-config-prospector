@@ -477,13 +477,9 @@ CONFIG_PROSPECTOR_LAYER_SLIDE_DEFAULT=y
 
 **Touch mode**: Can be toggled via Display Settings screen.
 
-### Channel Feature (v2.1 New)
+### Channel Feature (v1.1.2+)
 
 Channels allow filtering specific keyboards in multi-keyboard environments.
-
-#### Scanner Side (config/prospector_scanner.conf)
-
-Channel filtering is configured at runtime via the keyboard list screen (touch mode) or defaults to receiving all channels.
 
 #### Keyboard Side (your keyboard's .conf)
 
@@ -493,12 +489,23 @@ CONFIG_PROSPECTOR_CHANNEL=0    # 0 = broadcast to all scanners (default)
                                 # 1-255 = specific channel
 ```
 
+#### Scanner Side (config/prospector_scanner.conf)
+
+**Touch mode**: Channel can be changed dynamically via keyboard list screen (tap channel badge).
+
+**Non-touch mode**: Set channel via Kconfig:
+```conf
+# Channel filter for scanner (non-touch mode)
+CONFIG_PROSPECTOR_SCANNER_CHANNEL=0   # 0 = receive all (default)
+                                       # 1-255 = specific channel only
+```
+
 **Use case examples**:
 - **Home/Office separation**: Home keyboards on channel 1, office on channel 2
 - **Multi-user**: Each user's keyboards on different channels
 - **Testing**: Isolate test keyboards from production display
 
-**Important**: Both keyboard AND scanner need v2.1.0+ for channel filtering to work.
+**Compatibility**: Keyboard side works with v2.0.0+. Scanner side channel filter requires v2.1.0+ for touch mode dynamic switching.
 
 ### Peripheral Battery Slot Mapping (v2.1 New)
 
@@ -620,6 +627,9 @@ CONFIG_PROSPECTOR_MAX_LAYERS=7
 
 # ===== LAYER DISPLAY (v2.1) =====
 # CONFIG_PROSPECTOR_LAYER_SLIDE_DEFAULT=y  # Enable slide animation mode
+
+# ===== CHANNEL FILTER (non-touch mode only) =====
+# CONFIG_PROSPECTOR_SCANNER_CHANNEL=0      # 0=all, 1-255=specific channel
 
 # ===== BRIGHTNESS =====
 # Option 1: Fixed brightness (simple)
