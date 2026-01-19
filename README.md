@@ -1,35 +1,25 @@
 # Prospector Scanner - ZMK Status Display Device
 
-> 🚀 **PRE-RELEASE: v2.1b Available! (January 2026)**
+> **v2.1.0 (January 2026) - Zephyr 4.x & Universal Compatibility**
 >
-> **🎡 LAYER SLIDE MODE**: Animated dial-style layer display with smooth transitions
+> **🔧 ZEPHYR 4.x**: Updated for ZMK main branch, LVGL 9 (board: `xiao_ble/nrf52840`)
 >
-> **📡 RX Hz FIX**: Stable signal reception rate display with moving average
+> **⚡ IMPROVED RESPONSIVENESS**: Optimized latency for instant status updates
 >
-> **🔋 PERIPHERAL MAPPING**: Configure battery slot assignment for multi-peripheral setups
+> **🔋 DYNAMIC BATTERY**: Adapts display to connected keyboard count
 >
-> 👉 Use `revision: v2.1b` in west.yml (pre-release, full release coming as v2.1.0)
+> **🎡 LAYER SLIDE MODE (optional)**: Dial-style animated display, enables 10+ layer support
 >
-> 📦 **[Download pre-built firmware →](https://github.com/t-ogura/zmk-config-prospector/actions/runs/20990385693)** (Artifacts section)
-
-> 🎉 **NEW: v2.0.0 "Touch & Precision" Released! (November 20, 2025)**
->
-> **🎯 TOUCH PANEL SUPPORT**: Optional CST816S touch integration with swipe gestures
->
-> **⚡ USB CONNECTION FIX**: Displays "> USB" when keyboard is USB-connected (Issue #5)
->
-> **🔒 THREAD-SAFE**: Complete freeze elimination with LVGL mutex protection
->
-> **⏱️ TIMEOUT DIMMING**: Configurable brightness reduction when no keyboard activity
->
-> 👉 **[See complete v2.0 release notes →](docs/RELEASES/v2.0.0/release_notes.md)**
+> ⚠️ **Keyboard module compatibility**: Use `v2.0.0` for ZMK ≤0.3 (Zephyr 3.x)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v2.0.0-brightgreen" alt="Version 2.0.0 Touch & Precision">
+  <img src="https://img.shields.io/badge/version-v2.1.0-brightgreen" alt="Version 2.1.0">
   <img src="https://img.shields.io/badge/status-production%20ready-brightgreen" alt="Production Ready">
   <img src="https://img.shields.io/badge/ZMK-compatible-blue" alt="ZMK Compatible">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
 </p>
+
+**Latest**: [v2.1.0 Release Notes](docs/RELEASES/v2.1.0/release_notes.md)
 
 ---
 
@@ -50,6 +40,10 @@
 ---
 
 ## What is Prospector Scanner?
+
+<p align="center">
+  <img src="docs/images/scanner.jpg" alt="Prospector Scanner in action" width="600">
+</p>
 
 **Prospector Scanner** is an independent BLE status display device for ZMK keyboards. It monitors your keyboard's status (battery, layer, modifiers, WPM, etc.) in real-time without consuming a BLE connection slot.
 
@@ -99,6 +93,17 @@ Both modes use the same hardware:
 
 **Important**: Even "non-touch mode" uses the touch-enabled LCD - we simply don't wire the 4 touch pins. Original Prospector uses the same display but doesn't utilize touch functionality.
 
+### Where to Buy
+
+Ready-made Prospector kits are available at [beekeeb](https://shop.beekeeb.com/products/zmk-wireless-dongle-prospector-diy-kit).
+
+**Kit specifications**:
+- Touch panel: ✅ Supported (CST816S wired)
+- Ambient light sensor: ❌ Not included
+- Battery: ❌ Not included (USB powered only)
+
+See [Touch Mode Guide](docs/TOUCH_MODE.md) for touch configuration.
+
 ### Why Use It?
 
 - ✅ **See Everything**: Battery, layer, modifiers, WPM, signal strength
@@ -134,10 +139,10 @@ Both modes use the same hardware:
 ### 🎯 **Touch Panel Support** (v2.0 New)
 - **Optional CST816S Touch**: Enable with `CONFIG_PROSPECTOR_TOUCH_ENABLED=y`
 - **4-Direction Swipe Gestures**: Navigate settings screens intuitively
-- **Display Settings Screen**: Adjust brightness, auto-brightness on/off via touch slider
-- **System Settings Screen**: Future expansion for advanced configuration
+- **On-Device Settings**: Adjust max layers, channel filter, and more via touch
 - **Thread-Safe LVGL**: Complete freeze elimination with mutex protection
-- **Dynamic Memory**: Widgets created on-demand, destroyed when not needed
+
+👉 **[Touch Mode Guide →](docs/TOUCH_MODE.md)** for complete setup and screen descriptions
 
 ### 🌞 **Adaptive Brightness** (v1.1+)
 - **APDS9960 Integration**: Ambient light sensor with 4-pin mode (no interrupt required)
@@ -145,15 +150,6 @@ Both modes use the same hardware:
 - **Non-linear Response**: Intelligent mapping for comfortable viewing in all lighting conditions
 - **Auto/Manual Toggle**: Switch between sensor control and manual adjustment (touch mode)
 - **Activity-Based Dimming**: Automatic reduction to 5% when keyboards go idle (v2.0)
-
-### What's New in v2.0?
-
-- 🎯 **Touch Panel Support**: Optional CST816S touch for interactive settings
-- 🔌 **USB Display Fix**: Shows "> USB" when keyboard is USB-connected
-- 🔒 **Thread-Safe**: Eliminates random freezes during gestures
-- ⏱️ **Timeout Dimming**: Auto-dim to 5% on keyboard inactivity
-- 📊 **Signal Updates**: Stable 1Hz update for reception strength
-- 🌞 **4-Pin APDS9960**: Ambient light sensor without interrupt pin
 
 ---
 
@@ -227,11 +223,12 @@ Touch mode requires:
    - Wait ~5-10 minutes
 
 4. **Download Firmware**
+   - Click completed workflow run
    - Scroll to "Artifacts" section
-   - Download "firmware" zip
-   - Extract `prospector_scanner-seeeduino_xiao_ble-zmk.uf2`
-   - **Default**: Non-touch mode (6 display pins wired)
-   - **For touch mode**: See [Touch Mode Guide](docs/TOUCH_MODE.md) to enable touch in your fork
+   - Download:
+     - `prospector_scanner` - Non-touch mode (this guide)
+     - `prospector_scanner_touch` - Touch mode (see [Touch Mode Guide](docs/TOUCH_MODE.md))
+   - Extract and flash the `.uf2` file
 
 #### Option B: Local Build
 
@@ -248,14 +245,22 @@ west init -l config
 west update
 
 # Build (non-touch mode)
-west build -b seeeduino_xiao_ble -s zmk/app -- \
+west build -b xiao_ble/nrf52840 -s zmk/app -- \
   -DSHIELD=prospector_scanner \
   -DZMK_CONFIG="$(pwd)/config"
+
+# Build (touch mode) - see Touch Mode Guide for details
+west build -b xiao_ble/nrf52840 -s zmk/app -- \
+  -DSHIELD=prospector_scanner \
+  -DZMK_CONFIG="$(pwd)/config" \
+  -DEXTRA_CONF_FILE="$(pwd)/config/prospector_scanner_touch.conf"
 
 # Output: build/zephyr/zmk.uf2
 ```
 
 ### Step 2: Wire Hardware
+
+> **Purchased from beekeeb?** Skip this step - your kit is pre-wired!
 
 See [Hardware & Wiring](#hardware--wiring) for detailed pinout.
 
@@ -293,23 +298,47 @@ GND → GND
 
 ### Step 4: Configure Keyboard
 
-Add to your keyboard's `.conf` file:
+#### 4a. Add module to your keyboard's `config/west.yml`:
+
+```yaml
+manifest:
+  remotes:
+    - name: zmkfirmware
+      url-base: https://github.com/zmkfirmware
+    - name: prospector
+      url-base: https://github.com/t-ogura
+
+  projects:
+    - name: zmk
+      remote: zmkfirmware
+      revision: main
+      import: app/west.yml
+
+    # Add this:
+    - name: prospector-zmk-module
+      remote: prospector
+      revision: v2.1.0  # Use v2.0.0 for ZMK ≤0.3 (Zephyr 3.x)
+      path: modules/prospector-zmk-module
+```
+
+#### 4b. Add to your keyboard's `.conf` file:
 
 ```conf
 # Enable status advertisement
 CONFIG_ZMK_STATUS_ADVERTISEMENT=y
 CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME="MyKeyboard"
 
-# Power optimization (10Hz active, 0.03Hz idle)
-CONFIG_ZMK_STATUS_ADV_ACTIVITY_BASED=y
-CONFIG_ZMK_STATUS_ADV_ACTIVE_INTERVAL_MS=100
-CONFIG_ZMK_STATUS_ADV_IDLE_INTERVAL_MS=30000
-
-# Split keyboard battery monitoring (if applicable)
+# Split keyboard only: enable peripheral battery fetching
 CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING=y
 ```
 
-Rebuild and flash your keyboard firmware.
+#### 4c. Rebuild and flash:
+
+```bash
+west update
+west build -b your_board -- -DSHIELD=your_shield
+# Copy .uf2 to bootloader drive
+```
 
 ### Step 5: Test
 
@@ -444,22 +473,13 @@ CONFIG_LV_USE_BTN=y
 CONFIG_LV_USE_SLIDER=y
 CONFIG_LV_USE_SWITCH=y
 
-# Enable fonts (REQUIRED for widgets to compile)
-CONFIG_LV_FONT_MONTSERRAT_12=y
-CONFIG_LV_FONT_MONTSERRAT_16=y
-CONFIG_LV_FONT_MONTSERRAT_18=y
-CONFIG_LV_FONT_MONTSERRAT_20=y        # Default font
-CONFIG_LV_FONT_MONTSERRAT_22=y
-CONFIG_LV_FONT_MONTSERRAT_24=y
-CONFIG_LV_FONT_MONTSERRAT_28=y
-CONFIG_LV_FONT_UNSCII_8=y             # Pixel fonts
-CONFIG_LV_FONT_UNSCII_16=y
-
-# Set default font
-CONFIG_LV_FONT_DEFAULT_MONTSERRAT_20=y
+# Fonts (already configured in default prospector_scanner.conf)
+# CONFIG_LV_FONT_MONTSERRAT_12=y
+# CONFIG_LV_FONT_MONTSERRAT_16=y
+# ... etc
 ```
 
-**Why fonts matter**: If fonts are not enabled, build will fail with `'lv_font_montserrat_XX' undeclared` errors. Enable ALL fonts listed above.
+**Note**: Font settings are pre-configured in `prospector_scanner.conf`. No manual font configuration needed.
 
 ### Layer Display Configuration
 
@@ -474,6 +494,71 @@ CONFIG_PROSPECTOR_MAX_LAYERS=7        # Range: 4-10
 ```
 
 **Match your keyboard**: Set this to match your keyboard's layer count for best appearance. If your keyboard has 5 layers, set to 5 for optimal spacing.
+
+### Layer Slide Mode (v2.1 New)
+
+```conf
+# Enable dial-style animated layer display
+CONFIG_PROSPECTOR_LAYER_SLIDE_DEFAULT=y
+```
+
+**What it does**: Active layer slides to center position with smooth animation. Layer changes animate based on direction (increase = slide from right, decrease = slide from left).
+
+**Over-max behavior**: When layer exceeds `MAX_LAYERS`, displays a single large number instead of the layer list.
+
+**Touch mode**: Can be toggled on-device. See **[Touch Mode Guide](docs/TOUCH_MODE.md)** for details.
+
+### Channel Feature (v1.1.2+)
+
+Channels allow filtering specific keyboards in multi-keyboard environments.
+
+#### Keyboard Side (your keyboard's .conf)
+
+```conf
+# Channel broadcasting (add to your keyboard config)
+CONFIG_PROSPECTOR_CHANNEL=0    # 0 = broadcast to all scanners (default)
+                                # 1-9 = specific channel (recommended)
+                                # 10-255 = also supported but not selectable in touch UI
+```
+
+#### Scanner Side (config/prospector_scanner.conf)
+
+**Touch mode**: Channel can be changed dynamically on-device. See **[Touch Mode Guide](docs/TOUCH_MODE.md)**.
+
+**Non-touch mode**: Set channel via Kconfig:
+```conf
+# Channel filter for scanner (non-touch mode)
+CONFIG_PROSPECTOR_SCANNER_CHANNEL=0   # 0 = receive all (default)
+                                       # 1-9 = specific channel (recommended)
+```
+
+**Recommended range**: Use channels 0-9 for compatibility with touch mode UI.
+
+**Use case examples**:
+- **Home/Office separation**: Home keyboards on channel 1, office on channel 2
+- **Multi-user**: Each user's keyboards on different channels
+- **Testing**: Isolate test keyboards from production display
+
+**Compatibility**: Keyboard side works with v2.0.0+. Scanner side channel filter requires v2.1.0+ for touch mode dynamic switching.
+
+### Peripheral Battery Slot Mapping (v2.1 New)
+
+For split keyboards with multiple peripherals (e.g., keyboard half + trackball), you can remap which peripheral appears in which display slot.
+
+```conf
+# Add to your keyboard's .conf file
+CONFIG_ZMK_STATUS_ADV_HALF_PERIPHERAL=0   # Keyboard half slot (default: 0)
+CONFIG_ZMK_STATUS_ADV_AUX1_PERIPHERAL=1   # Aux1 slot, e.g., trackball (default: 1)
+CONFIG_ZMK_STATUS_ADV_AUX2_PERIPHERAL=2   # Aux2 slot, e.g., numpad (default: 2)
+```
+
+**When to use**: After `settings_reset`, peripherals may reconnect in different order than expected. Use these settings to fix the display order without re-pairing.
+
+**Example**: If your trackball (should be Aux1) connected before keyboard half:
+```conf
+CONFIG_ZMK_STATUS_ADV_HALF_PERIPHERAL=1   # Keyboard half is now index 1
+CONFIG_ZMK_STATUS_ADV_AUX1_PERIPHERAL=0   # Trackball is now index 0
+```
 
 ### Brightness Control
 
@@ -574,6 +659,12 @@ CONFIG_DISPLAY=y
 CONFIG_LVGL=y
 CONFIG_PROSPECTOR_MAX_LAYERS=7
 
+# ===== LAYER DISPLAY (v2.1) =====
+# CONFIG_PROSPECTOR_LAYER_SLIDE_DEFAULT=y  # Enable slide animation mode
+
+# ===== CHANNEL FILTER (non-touch mode only) =====
+# CONFIG_PROSPECTOR_SCANNER_CHANNEL=0      # 0=all, 1-255=specific channel
+
 # ===== BRIGHTNESS =====
 # Option 1: Fixed brightness (simple)
 CONFIG_PROSPECTOR_USE_AMBIENT_LIGHT_SENSOR=n
@@ -592,24 +683,14 @@ CONFIG_PROSPECTOR_SCANNER_TIMEOUT_BRIGHTNESS=5
 # ===== BATTERY =====
 CONFIG_PROSPECTOR_BATTERY_SUPPORT=n  # Enable if LiPo connected
 
-# ===== FONTS (REQUIRED) =====
-CONFIG_LV_FONT_MONTSERRAT_12=y
-CONFIG_LV_FONT_MONTSERRAT_16=y
-CONFIG_LV_FONT_MONTSERRAT_18=y
-CONFIG_LV_FONT_MONTSERRAT_20=y
-CONFIG_LV_FONT_MONTSERRAT_22=y
-CONFIG_LV_FONT_MONTSERRAT_24=y
-CONFIG_LV_FONT_MONTSERRAT_28=y
-CONFIG_LV_FONT_UNSCII_8=y
-CONFIG_LV_FONT_UNSCII_16=y
-CONFIG_LV_FONT_DEFAULT_MONTSERRAT_20=y
-
 # ===== LOGGING (optional) =====
 # CONFIG_LOG=y
 # CONFIG_ZMK_LOG_LEVEL_DBG=y
 ```
 
 Copy this template and customize for your needs.
+
+**For keyboard-side v2.1 features** (channel, peripheral mapping), see [Keyboard Integration](#keyboard-integration) section.
 
 ---
 
@@ -742,97 +823,35 @@ The keyboard adjusts broadcast frequency based on activity to save battery:
 
 ## 🎨 Display Features
 
-### Widget Layout (v2.0)
+### Main Screen
 
-```
-┌─────────────────────────────┐
-│ MyKeyboard            🔋 85%│ ← Device name (left), Scanner battery (right, v1.1+)
-│ > USB                 [P0] │ ← Connection status (left: > USB or BLE icon, right: profile)
-│                             │
-│ WPM                    RX   │ ← WPM (left), Signal info (right)
-│ 045             -45dBm 1.0Hz│   (RSSI + reception rate)
-│                             │
-│          Layer              │ ← Layer title
-│    0  1  2  3  4  5  6      │ ← Pastel colored layer indicators (0-15 supported)
-│                             │
-│        󰘴  󰘶  󰘵              │ ← Modifier key indicators (NerdFont icons)
-│                             │   󰘴=Ctrl, 󰘵=Shift, 󰘶=Alt, =GUI
-│                             │
-│    ████████████ 85%         │ ← Keyboard battery (main/central)
-│    ████████████ 78%         │ ← Split keyboard peripheral battery (if applicable)
-└─────────────────────────────┘
-```
+<img src="docs/images/display.jpg" alt="Main Screen Display" width="400">
 
-### Visual Elements
+| No. | Element | Description |
+|:---:|---------|-------------|
+| ① | **Keyboard Name** | Keyboard name configured via `CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME` |
+| ② | **WPM** | Words Per Minute - typing speed (5 characters = 1 word) |
+| ③ | **Connection Profile** | BLE connection status. **Colors**: White = Waiting, Blue = Communicating, Green = Connected. **Number** (0-4): Active BLE profile |
+| ④ | **Layer** | Current active layer index with pastel color coding |
+| ⑤ | **Modifier Keys** | Active modifier keys displayed when held (Ctrl, Shift, Alt, Cmd/Win) |
+| ⑥ | **Battery Level** | Battery bars with percentage. Split keyboards: L = Peripheral, R = Central |
+| ⑦ | **Communication Status** | RX signal strength (dBm) and reception frequency (Hz) |
 
-#### Battery Color Coding (5-Level System)
+**Note**: Scanner's own battery (if LiPo connected) appears at top-right corner.
 
-Battery bars use color-coded indicators for quick status recognition:
-
-| Range | Color | Hex Code | Visual |
-|-------|-------|----------|--------|
-| **80-100%** | Green | `#00CC66` | 🟢 Full/Healthy |
-| **60-79%** | Light Green | `#66CC00` | 🟢 Good |
-| **40-59%** | Yellow | `#FFCC00` | 🟡 Medium |
-| **20-39%** | Orange | `#FF9900` | 🟠 Low |
-| **0-19%** | Red | `#FF3333` | 🔴 Critical |
-
-#### Layer Display
-
-- **Pastel Colors**: 7-15 unique pastel colors for different layers
-- **Configurable Count**: Adjust max layers via `CONFIG_PROSPECTOR_MAX_LAYERS` (default: 7)
-- **Dynamic Centering**: Automatically adjusts spacing based on layer count
-  - 4 layers = wide spacing
-  - 10 layers = tight fit
-  - Always perfectly centered
-- **Active Indicator**: Current layer highlighted with brighter color
-
-#### Connection Status
-
-- **USB Mode**: Shows "> USB" text (v2.0 fix for Issue #5)
-- **BLE Mode**: Shows Bluetooth icon
-- **Profile**: Displays active BLE profile `[P0]` - `[P4]`
-
-#### WPM Display (Words Per Minute)
-
-- **Real-time Calculation**: Updates during typing with decay algorithm
-- **3-Digit Format**: `000` - `255` WPM
-- **Idle Decay**: Gradually decreases when typing stops
-- **Window**: Configurable (10s/30s/60s) via `CONFIG_ZMK_STATUS_ADV_WPM_WINDOW_SECONDS`
-
-#### Signal Status (Bottom Right)
-
-- **RSSI**: Signal strength in dBm (e.g., `-45dBm` = excellent, `-80dBm` = weak)
-- **Reception Rate**: Update frequency in Hz (e.g., `10Hz` = active typing, `0.03Hz` = idle)
-
-#### Scanner Battery (Top Right, v1.1+)
-
-- **Display**: Shows scanner's own battery level `🔋 85%`
-- **Charging Indicator**: Icon changes when USB charging
-- **Optional**: Only shown when `CONFIG_PROSPECTOR_BATTERY_SUPPORT=y`
-
-### Display Brightness (v2.0)
+### Display Brightness
 
 #### Auto-Brightness (APDS9960 Sensor)
 
-- **Sensor**: APDS9960 ambient light sensor (4-pin mode, no interrupt)
-- **Non-linear Response**: Maps sensor values to comfortable brightness levels
-- **Smooth Transitions**: Configurable fade (default: 800ms, 12 steps)
-- **USB/Battery Profiles**: Different max brightness for each power source
-- **Activity-Based Dimming**: Auto-dim to 5% after timeout (configurable)
-
-#### Manual Brightness (Touch Mode)
-
-- **Swipe Gesture**: Swipe DOWN to access Display Settings
-- **Slider Control**: Adjust brightness 0-100% via touch slider
-- **Persistent**: Settings saved to flash memory
-- **Auto-Brightness Toggle**: Enable/disable sensor control on-device
+- **Hardware**: APDS9960 ambient light sensor (4-pin mode, no interrupt needed)
+- **Behavior**: Smooth fade transitions (800ms, 12 steps)
+- **Range**: 20-100% based on ambient light
 
 #### Timeout Dimming (v2.0)
 
 - **Automatic**: Dims to 5% when no keyboard activity detected
-- **Configurable Timeout**: Set via `CONFIG_PROSPECTOR_SCANNER_TIMEOUT_MS` (default: 8 minutes)
-- **Wake on Activity**: Returns to normal brightness when keyboard activity resumes
+- **Configurable**: `CONFIG_PROSPECTOR_SCANNER_TIMEOUT_MS` (default: 8 minutes, 0=disabled)
+- **Wake on Activity**: Returns to normal brightness when keyboard sends data
 
 ---
 
@@ -855,35 +874,64 @@ manifest:
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: v0.3
+      revision: main
       import: app/west.yml
 
     # Add this:
     - name: prospector-zmk-module
       remote: prospector
-      revision: v2.0.0  # Use specific version tag
+      revision: v2.1.0  # Latest version
       path: modules/prospector-zmk-module
 ```
 
+> ⚠️ **ZMK version compatibility**:
+> - ZMK main (Zephyr 4.x): Use `revision: v2.1.0`
+> - ZMK ≤0.3 (Zephyr 3.x): Use `revision: v2.0.0`
+
 ### Step 2: Enable Status Advertisement
+
+#### Minimal Configuration (Quick Start)
 
 Add to your keyboard's `.conf` file:
 
 ```conf
-# Enable status advertisement
+# Required: Enable status advertisement
 CONFIG_ZMK_STATUS_ADVERTISEMENT=y
-CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME="MyKeyboard"  # Shown on scanner
+CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME="MyKeyboard"
+```
 
-# Activity-based intervals (battery optimization)
-CONFIG_ZMK_STATUS_ADV_ACTIVITY_BASED=y
-CONFIG_ZMK_STATUS_ADV_ACTIVE_INTERVAL_MS=100      # 10Hz when typing
-CONFIG_ZMK_STATUS_ADV_IDLE_INTERVAL_MS=30000      # 0.03Hz when idle
+That's it! Your keyboard will broadcast status at default intervals.
 
-# Split keyboard battery monitoring (if applicable)
-CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING=y
+#### Full Configuration (All Options)
 
-# (Optional) Central side selection for split keyboards
-# CONFIG_ZMK_STATUS_ADV_CENTRAL_SIDE="LEFT"  # or "RIGHT" (default)
+```conf
+# ===== REQUIRED =====
+CONFIG_ZMK_STATUS_ADVERTISEMENT=y
+CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME="MyKeyboard"  # Shown on scanner (max 8 chars)
+
+# ===== POWER OPTIMIZATION (all have sensible defaults) =====
+# CONFIG_ZMK_STATUS_ADV_ACTIVITY_BASED=y          # Default: y (enabled)
+# CONFIG_ZMK_STATUS_ADV_ACTIVE_INTERVAL_MS=200    # Default: 200 (5Hz when typing)
+# CONFIG_ZMK_STATUS_ADV_IDLE_INTERVAL_MS=30000    # Default: 30000 (0.03Hz when idle)
+# CONFIG_ZMK_STATUS_ADV_ACTIVITY_TIMEOUT_MS=10000 # Default: 10000 (10s before idle)
+
+# ===== SPLIT KEYBOARD =====
+CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING=y  # Fetch peripheral battery
+CONFIG_ZMK_STATUS_ADV_CENTRAL_SIDE="RIGHT"        # Which side is central (LEFT/RIGHT)
+
+# ===== PERIPHERAL BATTERY MAPPING (v2.1, for multi-peripheral setups) =====
+# Use when connection order doesn't match physical layout (e.g., after settings_reset)
+# CONFIG_ZMK_STATUS_ADV_HALF_PERIPHERAL=0         # Keyboard half slot (default: 0)
+# CONFIG_ZMK_STATUS_ADV_AUX1_PERIPHERAL=1         # Aux1 slot - e.g., trackball (default: 1)
+# CONFIG_ZMK_STATUS_ADV_AUX2_PERIPHERAL=2         # Aux2 slot - e.g., numpad (default: 2)
+
+# ===== WPM TRACKING =====
+CONFIG_ZMK_STATUS_ADV_WPM_WINDOW_SECONDS=30       # WPM calculation window (5-120s)
+
+# ===== CHANNEL (v1.1.2+, optional) =====
+# For multi-keyboard environments - filter by channel on scanner side
+# CONFIG_PROSPECTOR_CHANNEL=0                     # 0=broadcast to all (default)
+# CONFIG_PROSPECTOR_CHANNEL=1                     # 1-9=recommended (touch UI compatible)
 ```
 
 ### Step 3: Rebuild Keyboard Firmware
@@ -909,16 +957,13 @@ west build -b your_board -- -DSHIELD=your_shield
 ## Documentation
 
 ### Guides
-- **[Touch Mode Guide](docs/TOUCH_MODE.md)** - Complete touch panel setup and usage
-- **[v2.0 Release Notes](docs/RELEASES/v2.0.0/release_notes.md)** - Full changelog and migration guide
-- **[Architecture Design](SCANNER_RECONSTRUCTION_DESIGN.md)** - Technical architecture (local dev file)
+- **[Touch Mode Guide](docs/TOUCH_MODE.md)** - Touch panel setup, screen navigation, UI element descriptions
 
 ### Release History
-- **[All Releases](docs/RELEASES.md)** - Version history and release notes
-- **v2.0.0** (2025-11-20): Touch support, USB display fix, thread safety
-- **v1.1.1** (2025-08-29): Universal hardware compatibility, 10-layer support
-- **v1.1.0** (2025-08-26): Ambient light sensor, power optimization
-- **v1.0.0** (2025-08-01): Initial release with YADS-style UI
+- **[v2.1.0](docs/RELEASES/v2.1.0/release_notes.md)** (2026-01): Zephyr 4.x, improved responsiveness, layer slide mode
+- **[v2.0.0](docs/RELEASES/v2.0.0/release_notes.md)** (2025-11): Touch support, USB display fix, thread safety
+- **v1.1.x** (2025-08): Ambient light sensor, power optimization
+- **v1.0.0** (2025-08): Initial release with YADS-style UI
 
 ### GitHub Resources
 - **[Issues](https://github.com/t-ogura/zmk-config-prospector/issues)** - Bug reports and feature requests
@@ -948,18 +993,7 @@ west build -b your_board -- -DSHIELD=your_shield
 
 **Problem**: LVGL font not enabled.
 
-**Solution**: Enable ALL fonts in `prospector_scanner.conf`:
-```conf
-CONFIG_LV_FONT_MONTSERRAT_12=y
-CONFIG_LV_FONT_MONTSERRAT_16=y
-CONFIG_LV_FONT_MONTSERRAT_18=y
-CONFIG_LV_FONT_MONTSERRAT_20=y
-CONFIG_LV_FONT_MONTSERRAT_22=y
-CONFIG_LV_FONT_MONTSERRAT_24=y
-CONFIG_LV_FONT_MONTSERRAT_28=y
-CONFIG_LV_FONT_UNSCII_8=y
-CONFIG_LV_FONT_UNSCII_16=y
-```
+**Solution**: Use the default `prospector_scanner.conf` which includes all required font settings. If you're using a custom config, copy the font settings from the default file.
 
 ### Display Shows Nothing / Blank Screen
 
@@ -1065,6 +1099,21 @@ Shows technical information overlaid on screen. **Disable for production** (`=n`
 
 ---
 
+## Roadmap
+
+### v2.2.0 - Periodic Advertising (Planned)
+
+Future version will introduce **BLE Periodic Advertising** for improved reliability:
+
+- **Deterministic Timing**: Scanner knows exactly when to expect packets
+- **Reduced Packet Loss**: No more missed layer changes in noisy RF environments
+- **Lower Latency**: Potential for sub-100ms updates
+- **Power Efficiency**: Scanner can sleep between known broadcast times
+
+Periodic Advertising requires BLE 5.0+ and will maintain backward compatibility with v1/v2 protocol.
+
+---
+
 ## License & Attribution
 
 ### License
@@ -1118,4 +1167,4 @@ For major changes, please open an issue first to discuss what you would like to 
 
 **Questions?** Open an [issue](https://github.com/t-ogura/zmk-config-prospector/issues) or join [ZMK Discord](https://zmk.dev/community/discord/invite).
 
-**Prospector Scanner v2.0.0** - ZMK Status Display Device
+**Prospector Scanner v2.1.0** - ZMK Status Display Device

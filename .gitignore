@@ -31,3 +31,4 @@ build_local.sh
 
 # Test firmware builds
 test_firmware/
+BOOT_FIX_ATTEMPTS.md

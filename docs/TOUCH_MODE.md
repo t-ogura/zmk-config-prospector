@@ -1,17 +1,16 @@
 # Prospector Scanner Touch Mode Guide
 
-**Version**: v2.0.0
-**Last Updated**: November 20, 2025
+**Version**: v2.1.0
+**Last Updated**: January 2026
 
 ## 📋 Table of Contents
 
 1. [What's Different?](#whats-different) ⚠️ **Start Here**
 2. [Quick Start](#quick-start)
-3. [Configuration Reference](#configuration-reference)
-4. [Hardware Requirements](#hardware-requirements)
-5. [Complete Wiring Guide](#complete-wiring-guide)
-6. [Screen Guide](#screen-guide)
-7. [Troubleshooting](#troubleshooting)
+3. [Screen Guide](#screen-guide)
+4. [Gesture Reference](#gesture-reference)
+5. [Troubleshooting](#troubleshooting)
+6. [FAQ](#faq)
 
 ---
 
@@ -44,10 +43,11 @@ Total: 10 signal pins + VCC/GND
 
 ### What Touch Mode Enables
 
-- ✅ **Swipe Gestures**: Navigate between screens with 4-direction swipes
-- ✅ **Display Settings Screen**: Adjust max layers without rebuilding firmware
-- ✅ **On-Device Configuration**: Change settings in real-time
-- ✅ **Future Expandability**: More interactive features in upcoming releases
+- ✅ **Swipe Gestures**: Navigate between 5 screens with 4-direction swipes
+- ✅ **Display Settings**: Adjust brightness, max layers, slide mode
+- ✅ **Keyboard List**: View detected keyboards with channel filter
+- ✅ **Quick Actions**: Fast access to common operations
+- ✅ **Pong Wars**: Fun visual screensaver
 
 ---
 
@@ -72,56 +72,21 @@ Total: 10 signal pins + VCC/GND
 | TP_INT | D0 (P0.02) | Interrupt |
 | TP_RST | D1 (P0.28) | Reset |
 
-**Note**: If you already have standard Prospector Scanner wired (6 display pins), just add these 4 touch pins. See [Complete Wiring Guide](#complete-wiring-guide) for full pinout.
+**Note**: If you already have standard Prospector Scanner wired (6 display pins), just add these 4 touch pins. See [README - Hardware & Wiring](../README.md#hardware--wiring) for full pinout.
 
 ### Step 3: Build Touch Firmware
 
 #### Option A: GitHub Actions (Recommended)
 
-**Step 3.1: Fork Repository**
+The default workflow builds both touch and non-touch firmware automatically.
 
-1. Go to [zmk-config-prospector](https://github.com/t-ogura/zmk-config-prospector)
-2. Click **"Fork"** button (top-right)
-3. Wait for fork to complete
+1. **Fork repository**: Go to [zmk-config-prospector](https://github.com/t-ogura/zmk-config-prospector) → Click **"Fork"**
+2. **Enable Actions**: Go to "Actions" tab → Click "I understand my workflows, enable them"
+3. **Trigger build**: Actions tab → "Build" workflow → "Run workflow" → "Run workflow"
+4. **Download**: After ~5-10 minutes, download `prospector_scanner_touch` artifact
+5. **Extract**: Get the `.uf2` file from the zip
 
-**Step 3.2: Enable GitHub Actions**
-
-1. In your forked repository, go to **"Actions"** tab
-2. Click **"I understand my workflows, enable them"**
-3. GitHub Actions is now ready to build firmware
-
-**Step 3.3: Enable Touch Mode in Configuration**
-
-Edit `config/prospector_scanner.conf` in your fork to enable touch support:
-
-1. Click `config/prospector_scanner.conf` in your fork
-2. Click **pencil icon** (Edit)
-3. Change the following settings:
-
-```conf
-# Touch Panel Support - ENABLE for touch mode
-CONFIG_PROSPECTOR_TOUCH_ENABLED=y
-
-# Layer Display - Increase for touch mode adjustability
-CONFIG_PROSPECTOR_MAX_LAYERS=10
-
-# (Optional) Enable ambient light sensor if you have APDS9960
-# CONFIG_PROSPECTOR_USE_AMBIENT_LIGHT_SENSOR=y
-
-# (Optional) Enable battery support if you have LiPo connected
-# CONFIG_PROSPECTOR_BATTERY_SUPPORT=y
-```
-
-4. Click **"Commit changes"** → **"Commit directly to main branch"**
-
-**Step 3.4: Trigger and Download Build**
-
-1. Go to **"Actions"** tab
-2. Click **"Build"** workflow → **"Run workflow"** → **"Run workflow"**
-3. Wait for build to complete (~5-10 minutes)
-4. Scroll down to **"Artifacts"** section
-5. Download **"firmware"** zip file
-6. Extract `prospector_scanner-seeeduino_xiao_ble-zmk.uf2`
+**To customize settings** (optional): Edit `config/prospector_scanner.conf` before triggering build. See [README - Configuration Guide](../README.md#configuration-guide) for options.
 
 ### Step 4: Flash Firmware
 
@@ -166,7 +131,7 @@ CONFIG_PROSPECTOR_MAX_LAYERS=10
 
 ```bash
 # From zmk-config-prospector directory
-west build -b seeeduino_xiao_ble -s zmk/app -- \
+west build -b xiao_ble/nrf52840 -s zmk/app -- \
   -DSHIELD=prospector_scanner \
   -DZMK_CONFIG="$(pwd)/config"
 
@@ -178,177 +143,17 @@ west build -b seeeduino_xiao_ble -s zmk/app -- \
 ### Step 5: Test Touch
 
 1. Scanner should boot and show main screen
-2. Try **DOWN swipe** - Display Settings screen should appear
+2. Try **DOWN swipe** - Display Settings should appear
 3. Try **UP swipe** - Return to main screen
-4. Success! Touch mode is working
+4. Try **UP swipe** - Keyboard List should appear
+5. Try **DOWN swipe** - Return to main screen
+6. Try **RIGHT swipe** - Quick Actions should appear
+7. Try **LEFT swipe** - Return to main screen
+8. Success! Touch mode is working
 
 **If touch doesn't work**: See [Troubleshooting](#troubleshooting) section.
 
----
-
-## Configuration Reference
-
-### Key Configuration Settings
-
-These are the **essential settings** for touch mode. For complete reference, see the full config file.
-
-#### Touch Mode Enable (REQUIRED)
-
-```conf
-# Enable touch panel support
-CONFIG_PROSPECTOR_TOUCH_ENABLED=y
-```
-
-This single setting enables touch mode and automatically includes touch dependencies.
-
-#### Max Layers (Adjustable On-Device)
-
-```conf
-# Maximum layers displayable (compile-time limit)
-CONFIG_PROSPECTOR_MAX_LAYERS=10
-```
-
-**Important**: This sets the **maximum** value for the on-device slider. If set to 7, you cannot adjust beyond 7 layers in Display Settings without rebuilding firmware.
-
-#### Timeout Brightness
-
-```conf
-# Dim display after no keyboard reception
-CONFIG_PROSPECTOR_SCANNER_TIMEOUT_MS=480000      # 8 minutes (0=disabled)
-CONFIG_PROSPECTOR_SCANNER_TIMEOUT_BRIGHTNESS=5   # Dim to 5%
-```
-
-#### Ambient Light Sensor (Optional)
-
-```conf
-# Enable APDS9960 auto-brightness
-CONFIG_PROSPECTOR_USE_AMBIENT_LIGHT_SENSOR=y     # Requires hardware
-CONFIG_PROSPECTOR_FIXED_BRIGHTNESS=85            # Used when sensor disabled
-```
-
-### Complete Configuration File
-
-**File**: `config/prospector_scanner.conf`
-
-#### Essential Touch Settings
-
-```conf
-# Touch Panel Support - REQUIRED for touch mode
-CONFIG_PROSPECTOR_TOUCH_ENABLED=y
-
-# Touch panel dependencies (auto-enabled by above)
-CONFIG_INPUT=y                        # Zephyr input subsystem
-CONFIG_INPUT_CST816S=y                # CST816S driver
-CONFIG_INPUT_CST816S_INTERRUPT=y      # Interrupt-based detection
-```
-
-#### Display Configuration
-
-```conf
-# Display subsystem
-CONFIG_ZMK_DISPLAY=y
-CONFIG_DISPLAY=y
-CONFIG_LVGL=y
-
-# LVGL widgets for settings screens
-CONFIG_LV_USE_BTN=y                   # Buttons
-CONFIG_LV_USE_SLIDER=y                # Sliders
-CONFIG_LV_USE_SWITCH=y                # Toggle switches
-
-# LVGL fonts (required for all widgets)
-CONFIG_LV_FONT_MONTSERRAT_12=y
-CONFIG_LV_FONT_MONTSERRAT_16=y
-CONFIG_LV_FONT_MONTSERRAT_18=y
-CONFIG_LV_FONT_MONTSERRAT_20=y        # Default font
-CONFIG_LV_FONT_MONTSERRAT_22=y
-CONFIG_LV_FONT_MONTSERRAT_24=y
-CONFIG_LV_FONT_MONTSERRAT_28=y
-CONFIG_LV_FONT_UNSCII_8=y             # Pixel fonts
-CONFIG_LV_FONT_UNSCII_16=y
-```
-
-#### Scanner Settings
-
-```conf
-# Multi-keyboard support
-CONFIG_PROSPECTOR_MULTI_KEYBOARD=y
-CONFIG_PROSPECTOR_MAX_KEYBOARDS=5     # Maximum 5 keyboards
-
-# Layer display (adjustable in Display Settings)
-CONFIG_PROSPECTOR_MAX_LAYERS=7        # Default: 7 layers (0-6)
-                                      # Can be changed on-device: 4-10
-```
-
-#### Brightness Control
-
-```conf
-# Ambient light sensor (optional)
-CONFIG_PROSPECTOR_USE_AMBIENT_LIGHT_SENSOR=y  # Requires APDS9960 hardware
-CONFIG_PROSPECTOR_ALS_MIN_BRIGHTNESS=20       # Minimum brightness %
-CONFIG_PROSPECTOR_ALS_MAX_BRIGHTNESS_USB=100  # Maximum when USB powered
-
-# Smooth brightness transitions
-CONFIG_PROSPECTOR_BRIGHTNESS_FADE_DURATION_MS=800  # 800ms fade
-CONFIG_PROSPECTOR_BRIGHTNESS_FADE_STEPS=12         # 12 steps
-
-# Fixed brightness (when sensor disabled or unavailable)
-CONFIG_PROSPECTOR_FIXED_BRIGHTNESS=85         # Default 85%
-```
-
-#### Timeout Settings
-
-```conf
-# Timeout brightness control
-CONFIG_PROSPECTOR_SCANNER_TIMEOUT_MS=480000           # 8 minutes (0=disabled)
-CONFIG_PROSPECTOR_SCANNER_TIMEOUT_BRIGHTNESS=5       # Dim to 5% on timeout
-```
-
-#### Battery Support
-
-```conf
-# Scanner battery monitoring (requires LiPo connected)
-CONFIG_PROSPECTOR_BATTERY_SUPPORT=n   # Disabled by default
-CONFIG_ZMK_BATTERY_REPORTING=y        # Enable if battery connected
-```
-
-#### Debug Options
-
-```conf
-# USB logging (for development)
-CONFIG_LOG=y
-CONFIG_ZMK_LOG_LEVEL_DBG=y
-CONFIG_BT_LOG_LEVEL_WRN=y             # Reduce BT noise
-CONFIG_LOG_DEFAULT_LEVEL=4            # Info level
-
-# Debug widget (development only)
-CONFIG_PROSPECTOR_DEBUG_WIDGET=n      # Disable for production
-```
-
-### Device Tree Configuration
-
-**File**: `modules/prospector-zmk-module/boards/shields/prospector_scanner/prospector_scanner.overlay`
-
-Key sections for touch mode:
-
-```dts
-&i2c0 {
-    status = "okay";
-    pinctrl-0 = <&i2c0_default>;
-    pinctrl-1 = <&i2c0_sleep>;
-    pinctrl-names = "default", "sleep";
-
-    // CST816S Touch Controller
-    touch_sensor: cst816s@15 {
-        compatible = "hynitron,cst816s";
-        reg = <0x15>;
-        status = "okay";
-
-        // Touch panel control pins
-        irq-gpios = <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;  // D0
-        rst-gpios = <&xiao_d 1 GPIO_ACTIVE_LOW>;                    // D1
-    };
-};
-```
+**For other configuration options** (brightness, timeout, battery, etc.): See [README - Configuration Guide](../README.md#configuration-guide).
 
 ---
 
@@ -356,38 +161,14 @@ Key sections for touch mode:
 
 ### Main Screen (Default)
 
-The main status display - always visible at startup.
-
-#### Layout
-
-```
-┌─────────────────────────────┐
-│    Device Name          🔋  │ ← Scanner battery (if available)
-│ WPM: 45         [USB/BLE 2] │ ← WPM + Connection status
-│                             │
-│      Layer: 0 1 2 3 4       │ ← Active layers (dynamic centering)
-│     [Ctrl][Alt][Shift]      │ ← Active modifiers
-│                             │
-│   ████████ 85% ████████     │ ← Keyboard battery bars
-│         -45dBm 5.0Hz        │ ← Signal strength
-└─────────────────────────────┘
-```
-
-#### Widgets Explained
-
-1. **Device Name**: Keyboard name from `CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME`
-2. **Scanner Battery**: Top-right, shows scanner's own battery (if LiPo connected)
-3. **WPM**: Words per minute (typing speed)
-4. **Connection Status**: Shows active transport (USB or BLE) with profile number
-5. **Layer Display**: Active layer highlighted, count adjustable in Display Settings
-6. **Modifiers**: Ctrl/Alt/Shift/GUI shown when active (NerdFont icons)
-7. **Keyboard Battery**: Split keyboard left/right or single keyboard battery
-8. **Signal Status**: RSSI (dBm) and reception rate (Hz)
+The main screen is **identical to non-touch mode**. See [README - Display Features](../README.md#-display-features) for UI element descriptions.
 
 #### Gestures from Main Screen
 
 - **DOWN Swipe**: Open Display Settings
-- **UP/LEFT/RIGHT**: No action (reserved for future features)
+- **UP Swipe**: Open Keyboard List
+- **RIGHT Swipe**: Open Quick Actions
+- **LEFT Swipe**: Open Pong Wars (bonus!)
 
 ---
 
@@ -395,78 +176,105 @@ The main status display - always visible at startup.
 
 Interactive configuration screen - accessed via **DOWN swipe** from main screen.
 
-#### Layout
-
-```
-┌─────────────────────────────┐
-│     Display Settings        │ ← Screen title
-│                             │
-│  Max Layers: [====●===] 7   │ ← Slider widget
-│                             │
-│  [More settings coming...]  │ ← Future features
-│                             │
-│                             │
-│   ↑ Swipe up to return      │ ← Hint text
-└─────────────────────────────┘
-```
-
 #### Available Settings
 
-##### 1. Max Layers Setting
+Settings appear in this order from top to bottom:
 
-**What it does**: Controls how many layer indicators are shown on main screen.
+##### 1. Brightness
 
-**Range**: 4 - 10 layers
+**Slider**: Adjust display brightness (0-100%)
 
-**Default**: 7 layers (from `CONFIG_PROSPECTOR_MAX_LAYERS`)
+**Auto Toggle**: When enabled, brightness automatically adjusts based on ambient light sensor (requires APDS9960 hardware).
 
-**How to adjust**:
-1. Touch and drag the slider knob left/right
-2. Number updates in real-time
-3. Main screen layer display updates immediately
+##### 2. Scanner Battery
 
-**Visual Effect**:
-- **4 layers**: Wide spacing, large indicators
-- **7 layers**: Medium spacing (default)
-- **10 layers**: Tight spacing, maximum capacity
+**Toggle**: Show/hide scanner's own battery indicator on main screen.
 
-**Configuration Dependency**:
+**Note**: Only meaningful if LiPo battery is connected to XIAO BLE.
 
-⚠️ **IMPORTANT**: Slider range is LIMITED by Kconfig setting:
+##### 3. Max Layers
 
-```conf
-# In prospector_scanner.conf (when touch enabled)
-CONFIG_PROSPECTOR_MAX_LAYERS=10   # Allows adjusting up to 10 layers
-```
+**Slider**: Controls how many layer indicators are shown on main screen.
 
-If `CONFIG_PROSPECTOR_MAX_LAYERS=7`, slider maximum is 7 - cannot go higher without rebuilding firmware with increased Kconfig value.
+**Range**: 4 - 10 layers (limited by `CONFIG_PROSPECTOR_MAX_LAYERS`)
 
-**Why the limit?**: Memory is pre-allocated at compile time based on Kconfig value. Runtime adjustment cannot exceed compile-time maximum.
+**Slide Toggle**: Switch between two layer display modes:
 
-##### 2. Future Settings (Coming in v2.1+)
+| Mode | Description |
+|------|-------------|
+| **List Mode** (Slide OFF) | Shows all layer numbers. Active layer is highlighted. |
+| **Slide Mode** (Slide ON) | Dial-style animated display. Active layer slides to center position. |
 
-Planned settings for future releases:
-- **Brightness**: Manual brightness override (if auto-brightness disabled)
-- **Contrast**: Display contrast adjustment
-- **Color Scheme**: Dark/Light/Pastel theme selection
-- **WPM Window**: WPM calculation window (10s/30s/60s)
-- **Signal Averaging**: RSSI smoothing settings
+**Slide Mode Details**:
+- Layer change animates based on direction (increase = slide from right, decrease = slide from left)
+- When layer exceeds MAX_LAYERS, displays a single large number instead of the layer list
+- Smooth transition animation between modes
 
 #### Persistence Behavior
 
-⚠️ **v2.0 LIMITATION**: Settings do **NOT persist** across power cycles.
+⚠️ **Current Limitation**: Settings do **NOT persist** across power cycles.
 
-**What this means**:
 - Adjustments apply immediately while powered on
 - Settings reset to Kconfig defaults on reboot/power loss
-- **Workaround**: Adjust Kconfig values for permanent changes
-
-**Coming in v2.1**: NVS (Non-Volatile Storage) will save settings to flash memory.
+- **Workaround**: Set preferred defaults in Kconfig and rebuild
 
 #### Gestures from Display Settings
 
-- **UP Swipe**: Return to main screen (saves settings temporarily)
-- **DOWN/LEFT/RIGHT**: No action
+- **UP Swipe**: Return to main screen
+
+---
+
+### Keyboard List Screen
+
+Accessed via **UP swipe** from main screen. Shows all detected keyboards.
+
+#### Features
+
+- **Keyboard Cards**: Each detected keyboard shown as a card with name, battery, layer info
+- **Channel Filter**: Filter which keyboards to display
+
+#### Channel Filter Operations
+
+| Action | Description |
+|--------|-------------|
+| **Swipe LEFT** | Decrease channel (e.g., 2 → 1) |
+| **Swipe RIGHT** | Increase channel (e.g., 1 → 2) |
+| **Tap "Ch" label** | Open channel selection popup (0-9) |
+
+**Channel Values**:
+- **0**: Show all keyboards (no filter)
+- **1-9**: Only show keyboards broadcasting on that channel
+
+**Use case**: In multi-keyboard environments, filter to show only your keyboards.
+
+**Keyboard side**: Set `CONFIG_PROSPECTOR_CHANNEL=N` in your keyboard's config (see [README](../README.md#channel-feature-v112)).
+
+#### Gestures from Keyboard List
+
+- **DOWN Swipe**: Return to main screen
+- **LEFT/RIGHT Swipe**: Change channel filter
+
+---
+
+### Quick Actions Screen
+
+Accessed via **RIGHT swipe** from main screen.
+
+Quick access buttons for common operations.
+
+#### Gestures from Quick Actions
+
+- **LEFT Swipe**: Return to main screen
+
+---
+
+### Pong Wars Screen
+
+Accessed via **LEFT swipe** from main screen.
+
+Visual entertainment with two-color balls competitively painting the screen.
+
+- **RIGHT Swipe**: Return to main screen
 
 ---
 
@@ -474,33 +282,24 @@ Planned settings for future releases:
 
 ### Swipe Detection
 
-**Minimum Distance**: ~30 pixels (~20% of screen width)
-**Timeout**: Must complete within 500ms
-**Directions**: 4-way (Up/Down/Left/Right)
+- **Minimum Distance**: ~30 pixels (~20% of screen width)
+- **Timeout**: Must complete within 500ms
+- **Directions**: 4-way (Up/Down/Left/Right)
 
-### Gesture Map (v2.0)
+### Gesture Map (v2.1)
 
-| Gesture | From Main Screen | From Display Settings |
-|---------|-----------------|----------------------|
-| **DOWN** | Open Display Settings | No action |
-| **UP** | No action | Return to main screen |
-| **LEFT** | Reserved (future) | No action |
-| **RIGHT** | Reserved (future) | No action |
-
-### Planned Gestures (v2.1+)
-
-| Gesture | Planned Function |
-|---------|------------------|
-| **LEFT** | Quick brightness decrease |
-| **RIGHT** | Quick brightness increase |
-| **LONG PRESS** | Lock screen / screensaver |
-| **DOUBLE TAP** | Cycle through multiple main screens |
+| Gesture | Main Screen | Display Settings | Keyboard List | Quick Actions | Pong Wars |
+|---------|-------------|------------------|---------------|---------------|-----------|
+| **DOWN** | Display Settings | - | Main Screen | - | - |
+| **UP** | Keyboard List | Main Screen | - | - | - |
+| **LEFT** | Pong Wars | - | Channel -1 | Main Screen | - |
+| **RIGHT** | Quick Actions | - | Channel +1 | - | Main Screen |
 
 ### Gesture Feedback
 
-**Visual**: Screen transitions with LVGL animation (fade/slide)
-**No Haptic**: Waveshare display has no vibration motor
-**Audible**: No speaker - silent operation
+- **Visual**: Screen transitions with LVGL animation
+- **No Haptic**: Display has no vibration motor
+- **No Sound**: Silent operation
 
 ---
 
@@ -545,8 +344,7 @@ Planned settings for future releases:
 
 1. **Swipe Too Slow**: Must complete within 500ms
 2. **Swipe Too Short**: Minimum ~30 pixels distance required
-3. **Wrong Direction**: Only DOWN swipe works from main screen
-4. **Screen Busy**: Wait for animations to complete before next gesture
+3. **Screen Busy**: Wait for animations to complete before next gesture
 
 ### Display Settings Issues
 
@@ -563,29 +361,22 @@ Rebuild and reflash firmware.
 
 #### Symptom: Settings reset after reboot
 
-**Expected Behavior**: v2.0 does not persist settings.
+**Expected Behavior**: Settings do not persist across power cycles (current limitation).
 
 **Workaround**: Set desired defaults in Kconfig:
 ```conf
 CONFIG_PROSPECTOR_MAX_LAYERS=7  # Your preferred default
 ```
 
-**Permanent Fix**: Coming in v2.1 with NVS storage.
+Rebuild and reflash firmware with your preferred defaults.
 
 ### Build Errors
 
 #### Error: `'lv_font_montserrat_XX' undeclared`
 
-**Cause**: LVGL font not enabled.
+**Cause**: LVGL font not enabled in config.
 
-**Solution**: Enable all required fonts in `.conf`:
-```conf
-CONFIG_LV_FONT_MONTSERRAT_12=y
-CONFIG_LV_FONT_MONTSERRAT_16=y
-CONFIG_LV_FONT_MONTSERRAT_18=y
-CONFIG_LV_FONT_MONTSERRAT_20=y
-# ... (all fonts listed in Configuration Reference)
-```
+**Solution**: Use the default `prospector_scanner.conf` which includes all required fonts. If using a custom config, copy the font settings from the default file.
 
 #### Error: `undefined reference to touch_handler_register_lvgl_indev`
 
@@ -597,10 +388,10 @@ CONFIG_LV_FONT_MONTSERRAT_20=y
 
 #### Symptom: Screen freezes during swipes
 
-**Rare Issue**: Should be resolved in v2.0 with mutex protection.
+**Rare Issue**: Should be resolved in v2.0+ with mutex protection.
 
 **If it occurs**:
-1. Check firmware version - update to latest v2.0.0+
+1. Check firmware version - update to latest v2.1.0
 2. Reduce number of active keyboards being scanned (< 5)
 3. Disable debug widget if enabled: `CONFIG_PROSPECTOR_DEBUG_WIDGET=n`
 
@@ -687,14 +478,12 @@ Rebuild firmware. All touch code excluded at compile time.
 
 ### Will settings persist across reboots?
 
-**Not in v2.0** - settings reset to Kconfig defaults on power cycle.
+**Not currently** - settings reset to Kconfig defaults on power cycle.
 
 **For permanent settings**, edit Kconfig values and rebuild:
 ```conf
 CONFIG_PROSPECTOR_MAX_LAYERS=7  # Your preferred default
 ```
-
-**Future consideration**: Settings persistence may be added in a future release if there is user demand. This would require implementing flash storage for configuration values.
 
 ---
 
@@ -702,8 +491,8 @@ CONFIG_PROSPECTOR_MAX_LAYERS=7  # Your preferred default
 
 ### Documentation
 - [Main README](../README.md) - Project overview
-- [v2.0 Release Notes](RELEASES/v2.0.0/release_notes.md) - Complete changelog
-- [Architecture Design](../SCANNER_RECONSTRUCTION_DESIGN.md) - Technical details (local dev file)
+- [v2.1 Release Notes](RELEASES/v2.1.0/release_notes.md) - Complete changelog
+- [v2.0 Release Notes](RELEASES/v2.0.0/release_notes.md) - Previous version changelog
 
 ### Hardware Guides
 - [Waveshare 1.69" Touch LCD Datasheet](https://www.waveshare.com/wiki/1.69inch_Touch_LCD)
@@ -731,4 +520,5 @@ We are deeply grateful for kot149's detailed documentation and exploration of to
 ---
 
 **Version History**:
-- **v2.0.0** (2025-11-20): Initial touch mode documentation
+- **v2.1.0** (2026-01): Zephyr 4.x compatibility, Keyboard List with channel filter, Layer Slide Mode, Pong Wars
+- **v2.0.0** (2025-11-20): Initial touch mode with Display Settings screen
