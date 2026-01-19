@@ -41,6 +41,10 @@
 
 ## What is Prospector Scanner?
 
+<p align="center">
+  <img src="docs/images/scanner.jpg" alt="Prospector Scanner in action" width="600">
+</p>
+
 **Prospector Scanner** is an independent BLE status display device for ZMK keyboards. It monitors your keyboard's status (battery, layer, modifiers, WPM, etc.) in real-time without consuming a BLE connection slot.
 
 ### About Prospector
