@@ -6,7 +6,7 @@ This directory contains release notes for all versions of Prospector Scanner.
 
 | Version | Release Date | Status | Highlights |
 |---------|-------------|--------|------------|
-| [v2.1.0](v2.1.0/release_notes.md) | 2026-01 | **Latest Stable** | Zephyr 4.x compatibility, latency optimization, layer limit fix, sleep/wake recovery |
+| [v2.1.0](v2.1.0/release_notes.md) | 2026-01 | **Latest Stable** | Zephyr 4.x, dynamic battery display, channel filter, layer slide mode, Pong Wars |
 | [v2.0.0](v2.0.0/release_notes.md) | 2025-11-20 | Stable | Touch panel support, USB display fix, thread safety, timeout brightness |
 | [v1.1.1](v1.1.1/release_notes.md) | 2025-08-29 | Stable | Universal compatibility, 10-layer support, Device Tree fallback |
 | [v1.1.0](v1.1.0/release_notes.md) | 2025-08-15 | Stable | 15x power optimization, battery support, ambient light sensor |
