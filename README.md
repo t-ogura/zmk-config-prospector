@@ -486,19 +486,22 @@ Channels allow filtering specific keyboards in multi-keyboard environments.
 ```conf
 # Channel broadcasting (add to your keyboard config)
 CONFIG_PROSPECTOR_CHANNEL=0    # 0 = broadcast to all scanners (default)
-                                # 1-255 = specific channel
+                                # 1-9 = specific channel (recommended)
+                                # 10-255 = also supported but not selectable in touch UI
 ```
 
 #### Scanner Side (config/prospector_scanner.conf)
 
-**Touch mode**: Channel can be changed dynamically via keyboard list screen (tap channel badge).
+**Touch mode**: Channel can be changed dynamically via keyboard list screen (tap channel badge). Supports 0-9.
 
 **Non-touch mode**: Set channel via Kconfig:
 ```conf
 # Channel filter for scanner (non-touch mode)
 CONFIG_PROSPECTOR_SCANNER_CHANNEL=0   # 0 = receive all (default)
-                                       # 1-255 = specific channel only
+                                       # 1-9 = specific channel (recommended)
 ```
+
+**Recommended range**: Use channels 0-9 for compatibility with touch mode UI.
 
 **Use case examples**:
 - **Home/Office separation**: Home keyboards on channel 1, office on channel 2
@@ -956,10 +959,10 @@ CONFIG_ZMK_STATUS_ADV_CENTRAL_SIDE="RIGHT"        # Which side is central (LEFT/
 # ===== WPM TRACKING =====
 CONFIG_ZMK_STATUS_ADV_WPM_WINDOW_SECONDS=30       # WPM calculation window (5-120s)
 
-# ===== CHANNEL (v2.1, optional) =====
+# ===== CHANNEL (v1.1.2+, optional) =====
 # For multi-keyboard environments - filter by channel on scanner side
 # CONFIG_PROSPECTOR_CHANNEL=0                     # 0=broadcast to all (default)
-# CONFIG_PROSPECTOR_CHANNEL=1                     # 1-255=specific channel
+# CONFIG_PROSPECTOR_CHANNEL=1                     # 1-9=recommended (touch UI compatible)
 ```
 
 ### Step 3: Rebuild Keyboard Firmware
