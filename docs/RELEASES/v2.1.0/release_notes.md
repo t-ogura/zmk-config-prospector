@@ -10,7 +10,13 @@ v2.1.0 brings **Zephyr 4.x / ZMK main branch compatibility** along with major ne
 
 ### 🏆 **Major New Features**
 
-#### **1. Dynamic Battery Display** 🔋
+#### **1. Zephyr 4.x Compatibility** 🔧
+- **Board Name Change**: `seeeduino_xiao_ble` → `xiao_ble/nrf52840`
+- **LVGL 9 Migration**: Updated for new LVGL API
+- **Extended Advertising**: Native `BT_EXT_ADV` support
+- **ZMK Main Branch**: Full compatibility with latest ZMK
+
+#### **2. Dynamic Battery Display** 🔋
 - **Adaptive Layout**: Automatically adjusts to 1-4 keyboards
 - **Smart Labels**:
   - 1 keyboard: No label (wide bar)
@@ -19,26 +25,26 @@ v2.1.0 brings **Zephyr 4.x / ZMK main branch compatibility** along with major ne
   - 4 keyboards: L / R / A1 / A2
 - **Wider Single Bar**: 165px width (1.5x) for single keyboard
 
-#### **2. Channel Feature** 📡
+#### **3. Channel Feature** 📡
 - **Keyboard Side**: `CONFIG_PROSPECTOR_CHANNEL` (0=broadcast, 1-255=specific)
 - **Scanner Side**: Channel filter in keyboard list screen
 - **Use Case**: Filter specific keyboards in multi-keyboard environments
 - **Badge Display**: Shows channel number on keyboard list
 
-#### **3. Layer Slide Mode** 🎡
+#### **4. Layer Slide Mode** 🎡
 - **Dial-Style Animation**: Active layer slides to center position
 - **Direction-Based**: Animates based on layer change direction
 - **Config Option**: `CONFIG_PROSPECTOR_LAYER_SLIDE_DEFAULT=y`
 - **Touch Toggle**: Change mode via Display Settings (touch mode)
 
-#### **4. Over-Max Layer Display** 🔢
+#### **5. Over-Max Layer Display** 🔢
 - **Large Number Mode**: Layers >= max_layers show single large digit
 - **Slide Animations**:
   - Layer increase: slides from right
   - Layer decrease: slides from left
 - **Smooth Transitions**: Between list mode and over-max mode
 
-#### **5. Peripheral Battery Slot Mapping** 🔄
+#### **6. Peripheral Battery Slot Mapping** 🔄
 - **Configurable Slots**: Remap peripheral indices to display slots
 - **Config Options**:
   - `CONFIG_ZMK_STATUS_ADV_HALF_PERIPHERAL` (default: 0)
@@ -46,16 +52,10 @@ v2.1.0 brings **Zephyr 4.x / ZMK main branch compatibility** along with major ne
   - `CONFIG_ZMK_STATUS_ADV_AUX2_PERIPHERAL` (default: 2)
 - **Use Case**: When connection order doesn't match physical layout
 
-#### **6. Pong Wars Screensaver** 🎮 *(Touch Mode)*
+#### **7. Pong Wars Screensaver** 🎮 *(Touch Mode)*
 - **Visual Entertainment**: Two-color balls paint the screen
-- **Access**: LEFT swipe → System Settings → Pong Wars
-- **Auto-Stop**: Returns to main screen on any touch
-
-#### **7. Zephyr 4.x Compatibility** 🔧
-- **Board Name Change**: `seeeduino_xiao_ble` → `xiao_ble/nrf52840`
-- **LVGL 9 Migration**: Updated for new LVGL API
-- **Extended Advertising**: Native `BT_EXT_ADV` support
-- **ZMK Main Branch**: Full compatibility with latest ZMK
+- **Access**: LEFT swipe from main screen
+- **Exit**: RIGHT swipe to return
 
 ### 🏗️ **Improvements**
 

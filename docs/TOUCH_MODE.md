@@ -520,5 +520,5 @@ We are deeply grateful for kot149's detailed documentation and exploration of to
 ---
 
 **Version History**:
-- **v2.1.0** (2026-01): System Settings screen (Pong Wars, Channel Filter), Layer Slide Mode toggle, Zephyr 4.x compatibility
+- **v2.1.0** (2026-01): Zephyr 4.x compatibility, Keyboard List with channel filter, Layer Slide Mode, Pong Wars
 - **v2.0.0** (2025-11-20): Initial touch mode with Display Settings screen
