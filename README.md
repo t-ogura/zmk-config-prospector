@@ -1,25 +1,53 @@
 # Prospector Scanner - ZMK Status Display Device
 
-> **v2.1.0 (January 2026) - Zephyr 4.x & Universal Compatibility**
+> **v2.2b (February 2026) - Beta Release**
 >
-> **🔧 ZEPHYR 4.x**: Updated for ZMK main branch, LVGL 9 (board: `xiao_ble/nrf52840`)
+> **🎨 NEW LAYOUTS**: Operator / Radii / Field display layouts (inspired by [carrefinho](https://github.com/carrefinho/prospector-zmk-module))
 >
-> **⚡ IMPROVED RESPONSIVENESS**: Optimized latency for instant status updates
+> **🔧 BLE ADV REBUILD**: 3-mode Hybrid ADV (Piggyback / Non-connectable / Connectable Proxy)
 >
-> **🔋 DYNAMIC BATTERY**: Adapts display to connected keyboard count
+> **🔑 HWINFO KEYBOARD ID**: Hardware-unique ID prevents duplicate keyboard entries on profile switch
 >
-> **🎡 LAYER SLIDE MODE (optional)**: Dial-style animated display, enables 10+ layer support
+> **💾 NVS PERSISTENCE**: Settings (channel, brightness, layout) survive reboot
 >
-> ⚠️ **Keyboard module compatibility**: Use `v2.0.0` for ZMK ≤0.3 (Zephyr 3.x)
+> **⚙️ NON-TOUCH LAYOUT**: `CONFIG_PROSPECTOR_DEFAULT_LAYOUT` for startup layout selection without touch
+>
+> ⚠️ **Beta**: Testing release. For stable, use `v2.1.0`. Keyboard module compatibility: Use `v2.0.0` for ZMK ≤0.3 (Zephyr 3.x)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v2.1.0-brightgreen" alt="Version 2.1.0">
-  <img src="https://img.shields.io/badge/status-production%20ready-brightgreen" alt="Production Ready">
+  <img src="https://img.shields.io/badge/version-v2.2b-orange" alt="Version 2.2b">
+  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta">
   <img src="https://img.shields.io/badge/ZMK-compatible-blue" alt="ZMK Compatible">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
 </p>
 
-**Latest**: [v2.1.0 Release Notes](docs/RELEASES/v2.1.0/release_notes.md)
+**Latest stable**: [v2.1.0 Release Notes](docs/RELEASES/v2.1.0/release_notes.md)
+
+### Changes from v2.1.0
+
+**Bug Fixes**:
+- Keyboard ID collision fix (HWINFO-based hardware-unique ID)
+- Kconfig FADE_STEPS duplicate / MIPI_DBI type missing
+- I2C0 overlay conflict (moved to shield-level)
+- Keyboard name stuck/flicker/same-name collision on scanner
+
+**New Features**:
+- 3 new display layouts: Operator, Radii, Field
+- NVS settings persistence (channel, brightness, layout)
+- `CONFIG_PROSPECTOR_DEFAULT_LAYOUT` for non-touch startup layout
+- 3-battery bar display (auto-switch from arc when 3+ peripherals)
+- Layer name 4 chars (was 3)
+
+**BLE ADV**:
+- 3-mode Hybrid: Piggyback (disconnected) / Non-connectable (connected) / Connectable Proxy (profile switch)
+- Activity-based intervals, scannable MODE 2, optional KEYBOARD_NAME override
+
+**Keyboard-side `west.yml`**:
+```yaml
+- name: prospector-zmk-module
+  remote: prospector
+  revision: v2.2b  # Beta (use v2.1.0 for stable)
+```
 
 ---
 
@@ -317,7 +345,7 @@ manifest:
     # Add this:
     - name: prospector-zmk-module
       remote: prospector
-      revision: v2.1.0  # Use v2.0.0 for ZMK ≤0.3 (Zephyr 3.x)
+      revision: v2.2b  # Beta (v2.1.0 for stable, v2.0.0 for Zephyr 3.x)
       path: modules/prospector-zmk-module
 ```
 
@@ -880,12 +908,12 @@ manifest:
     # Add this:
     - name: prospector-zmk-module
       remote: prospector
-      revision: v2.1.0  # Latest version
+      revision: v2.2b  # Beta (v2.1.0 for stable)
       path: modules/prospector-zmk-module
 ```
 
 > ⚠️ **ZMK version compatibility**:
-> - ZMK main (Zephyr 4.x): Use `revision: v2.1.0`
+> - ZMK main (Zephyr 4.x): Use `revision: v2.2b` (beta) or `v2.1.0` (stable)
 > - ZMK ≤0.3 (Zephyr 3.x): Use `revision: v2.0.0`
 
 ### Step 2: Enable Status Advertisement
@@ -960,6 +988,7 @@ west build -b your_board -- -DSHIELD=your_shield
 - **[Touch Mode Guide](docs/TOUCH_MODE.md)** - Touch panel setup, screen navigation, UI element descriptions
 
 ### Release History
+- **v2.2b** (2026-02): Beta - New layouts, BLE ADV rebuild, HWINFO keyboard ID, NVS persistence
 - **[v2.1.0](docs/RELEASES/v2.1.0/release_notes.md)** (2026-01): Zephyr 4.x, improved responsiveness, layer slide mode
 - **[v2.0.0](docs/RELEASES/v2.0.0/release_notes.md)** (2025-11): Touch support, USB display fix, thread safety
 - **v1.1.x** (2025-08): Ambient light sensor, power optimization
@@ -1101,16 +1130,9 @@ Shows technical information overlaid on screen. **Disable for production** (`=n`
 
 ## Roadmap
 
-### v2.2.0 - Periodic Advertising (Planned)
+### v2.2.0 - Stable Release (Planned)
 
-Future version will introduce **BLE Periodic Advertising** for improved reliability:
-
-- **Deterministic Timing**: Scanner knows exactly when to expect packets
-- **Reduced Packet Loss**: No more missed layer changes in noisy RF environments
-- **Lower Latency**: Potential for sub-100ms updates
-- **Power Efficiency**: Scanner can sleep between known broadcast times
-
-Periodic Advertising requires BLE 5.0+ and will maintain backward compatibility with v1/v2 protocol.
+v2.2b is currently in beta testing. After testing is complete, a stable v2.2.0 release will be published.
 
 ---
 
@@ -1167,4 +1189,4 @@ For major changes, please open an issue first to discuss what you would like to 
 
 **Questions?** Open an [issue](https://github.com/t-ogura/zmk-config-prospector/issues) or join [ZMK Discord](https://zmk.dev/community/discord/invite).
 
-**Prospector Scanner v2.1.0** - ZMK Status Display Device
+**Prospector Scanner v2.2b** - ZMK Status Display Device
