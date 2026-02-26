@@ -12,7 +12,7 @@
 >
 > **⚙️ NON-TOUCH LAYOUT**: `CONFIG_PROSPECTOR_DEFAULT_LAYOUT` for startup layout selection without touch
 >
-> ⚠️ **Beta**: Testing release. For stable, use `v2.1.0`. Keyboard module compatibility: Use `v2.0.0` for ZMK ≤0.3 (Zephyr 3.x)
+> ⚠️ **Beta**: Testing release. For stable, use `v2.1.0`. Compatible with both Zephyr 4.x and 3.x.
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-v2.2b-orange" alt="Version 2.2b">
@@ -345,7 +345,7 @@ manifest:
     # Add this:
     - name: prospector-zmk-module
       remote: prospector
-      revision: v2.2b  # Beta (v2.1.0 for stable, v2.0.0 for Zephyr 3.x)
+      revision: v2.2b  # Beta (v2.1.0 for stable)
       path: modules/prospector-zmk-module
 ```
 
@@ -913,8 +913,8 @@ manifest:
 ```
 
 > ⚠️ **ZMK version compatibility**:
-> - ZMK main (Zephyr 4.x): Use `revision: v2.2b` (beta) or `v2.1.0` (stable)
-> - ZMK ≤0.3 (Zephyr 3.x): Use `revision: v2.0.0`
+> - `v2.2b` (beta) / `v2.1.0` (stable): Zephyr 4.x and 3.x both supported
+> - `v2.0.0`: Zephyr 3.x only
 
 ### Step 2: Enable Status Advertisement
 
