@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
 </p>
 
-**Latest**: [v2.1.0 Release Notes](docs/RELEASES/v2.1.0/release_notes.md)
+**Latest stable**: [v2.1.0 Release Notes](docs/RELEASES/v2.1.0/release_notes.md) | **Pre-release**: [v2.2b](https://github.com/t-ogura/zmk-config-prospector/tree/v2.2b) (new layouts, BLE ADV rebuild, HWINFO keyboard ID, NVS persistence)
 
 ---
 
