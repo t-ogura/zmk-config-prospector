@@ -84,20 +84,9 @@
 
 ### Why Scanner Mode?
 
-```
-Dongle Mode (Original):              Scanner Mode (This Project):
-┌─────────────┐                      ┌─────────────┐
-│  Keyboard   │─BLE Connection──┐    │  Keyboard   │  BLE Adv (broadcast)
-└─────────────┘                 │    └─────────────┘       ↓
-                                ↓           │              ↓
-                        ┌──────────────┐   ├── PC     ┌──────────────┐
-                        │   Dongle     │   ├── Tablet │   Scanner    │
-                        │ (Prospector) │   ├── Phone  │ (Prospector) │
-                        └──────────────┘   └── ...    └──────────────┘
-                                │                      (just monitors)
-                                └─→ PC (only 1 device)
-Keyboard loses multi-device!         Keyboard keeps 5 devices!
-```
+<p align="center">
+  <img src="docs/images/why_scanner.png" alt="Dongle Mode vs Scanner Mode" width="700">
+</p>
 
 **Key Benefit**: Your keyboard stays fully functional with all devices while Scanner provides visual monitoring.
 
