@@ -1,7 +1,7 @@
 # Prospector Scanner Touch Mode Guide
 
-**Version**: v2.1.0
-**Last Updated**: January 2026
+**Version**: v2.2.0
+**Last Updated**: April 2026
 
 ## 📋 Table of Contents
 
@@ -43,11 +43,11 @@ Total: 10 signal pins + VCC/GND
 
 ### What Touch Mode Enables
 
-- ✅ **Swipe Gestures**: Navigate between 5 screens with 4-direction swipes
+- ✅ **Swipe Gestures**: Navigate between screens with 4-direction swipes
 - ✅ **Display Settings**: Adjust brightness, max layers, slide mode
 - ✅ **Keyboard List**: View detected keyboards with channel filter
-- ✅ **Quick Actions**: Fast access to common operations
-- ✅ **Pong Wars**: Fun visual screensaver
+- ✅ **Quick Actions**: Bootloader/Reset + firmware version display
+- ✅ **Prospector Display**: Cycle through Field, Operator, Radii layouts
 
 ---
 
@@ -168,7 +168,7 @@ The main screen is **identical to non-touch mode**. See [README - Display Featur
 - **DOWN Swipe**: Open Display Settings
 - **UP Swipe**: Open Keyboard List
 - **RIGHT Swipe**: Open Quick Actions
-- **LEFT Swipe**: Open Pong Wars (bonus!)
+- **LEFT Swipe**: Open Prospector Display (Field / Operator / Radii layouts)
 
 ---
 
@@ -212,11 +212,12 @@ Settings appear in this order from top to bottom:
 
 #### Persistence Behavior
 
-⚠️ **Current Limitation**: Settings do **NOT persist** across power cycles.
+✅ **NVS Persistence** (v2.2.0): Settings **persist** across power cycles.
 
-- Adjustments apply immediately while powered on
-- Settings reset to Kconfig defaults on reboot/power loss
-- **Workaround**: Set preferred defaults in Kconfig and rebuild
+- Adjustments apply immediately and are saved to NVS flash
+- Settings survive reboot and power loss
+- Uses dirty flag + screen transition flush to prevent excessive writes
+- To reset to defaults: use System Reset in Quick Actions screen
 
 #### Gestures from Display Settings
 
@@ -260,7 +261,10 @@ Accessed via **UP swipe** from main screen. Shows all detected keyboards.
 
 Accessed via **RIGHT swipe** from main screen.
 
-Quick access buttons for common operations.
+- **Scanner version**: Shows scanner firmware version (e.g., `Scanner v2.2.0`)
+- **Keyboard version**: Shows connected keyboard's firmware version (e.g., `KB: Cornix TB v2.2.0`)
+- **Enter Bootloader**: Enter bootloader mode for firmware flashing
+- **System Reset**: Reset device (clears NVS settings)
 
 #### Gestures from Quick Actions
 
@@ -268,13 +272,19 @@ Quick access buttons for common operations.
 
 ---
 
-### Pong Wars Screen
+### Prospector Display Screen
 
 Accessed via **LEFT swipe** from main screen.
 
-Visual entertainment with two-color balls competitively painting the screen.
+Alternative display layouts showing keyboard status in different visual styles:
+- **Field**: Animated line segments driven by WPM
+- **Operator**: Minimalist with dot indicators and arc/bar battery display
+- **Radii**: Circular wheel indicator
+
+#### Gestures from Prospector Display
 
 - **RIGHT Swipe**: Return to main screen
+- **UP/DOWN Swipe**: Cycle through layouts (Field → Operator → Radii → Field)
 
 ---
 
@@ -286,13 +296,13 @@ Visual entertainment with two-color balls competitively painting the screen.
 - **Timeout**: Must complete within 500ms
 - **Directions**: 4-way (Up/Down/Left/Right)
 
-### Gesture Map (v2.1)
+### Gesture Map (v2.2)
 
-| Gesture | Main Screen | Display Settings | Keyboard List | Quick Actions | Pong Wars |
-|---------|-------------|------------------|---------------|---------------|-----------|
-| **DOWN** | Display Settings | - | Main Screen | - | - |
-| **UP** | Keyboard List | Main Screen | - | - | - |
-| **LEFT** | Pong Wars | - | Channel -1 | Main Screen | - |
+| Gesture | Main Screen | Display Settings | Keyboard List | Quick Actions | Prospector Display |
+|---------|-------------|------------------|---------------|---------------|-------------------|
+| **DOWN** | Display Settings | - | Main Screen | - | Next Layout |
+| **UP** | Keyboard List | Main Screen | - | - | Previous Layout |
+| **LEFT** | Prospector Display | - | Channel -1 | Main Screen | - |
 | **RIGHT** | Quick Actions | - | Channel +1 | - | Main Screen |
 
 ### Gesture Feedback
@@ -361,14 +371,11 @@ Rebuild and reflash firmware.
 
 #### Symptom: Settings reset after reboot
 
-**Expected Behavior**: Settings do not persist across power cycles (current limitation).
+**v2.2.0+**: Settings should persist via NVS. If they don't:
+1. Ensure you're running v2.2.0 or later firmware
+2. Try System Reset in Quick Actions, then reconfigure
 
-**Workaround**: Set desired defaults in Kconfig:
-```conf
-CONFIG_PROSPECTOR_MAX_LAYERS=7  # Your preferred default
-```
-
-Rebuild and reflash firmware with your preferred defaults.
+**v2.1.0 and earlier**: Settings do not persist (expected). Set defaults in Kconfig and rebuild.
 
 ### Build Errors
 
@@ -388,12 +395,11 @@ Rebuild and reflash firmware with your preferred defaults.
 
 #### Symptom: Screen freezes during swipes
 
-**Rare Issue**: Should be resolved in v2.0+ with mutex protection.
+**Rare Issue**: Should be resolved in v2.2.0 with mutex + work handler architecture.
 
 **If it occurs**:
-1. Check firmware version - update to latest v2.1.0
-2. Reduce number of active keyboards being scanned (< 5)
-3. Disable debug widget if enabled: `CONFIG_PROSPECTOR_DEBUG_WIDGET=n`
+1. Check firmware version - update to latest v2.2.0
+2. Disable debug widget if enabled: `CONFIG_PROSPECTOR_DEBUG_WIDGET=n`
 
 **Report**: If freezing persists, please open GitHub issue with:
 - Firmware version
@@ -478,12 +484,9 @@ Rebuild firmware. All touch code excluded at compile time.
 
 ### Will settings persist across reboots?
 
-**Not currently** - settings reset to Kconfig defaults on power cycle.
+**Yes** (v2.2.0+) - settings are saved to NVS flash and persist across reboots and power cycles.
 
-**For permanent settings**, edit Kconfig values and rebuild:
-```conf
-CONFIG_PROSPECTOR_MAX_LAYERS=7  # Your preferred default
-```
+To reset settings to defaults, use System Reset in the Quick Actions screen.
 
 ---
 
@@ -491,8 +494,8 @@ CONFIG_PROSPECTOR_MAX_LAYERS=7  # Your preferred default
 
 ### Documentation
 - [Main README](../README.md) - Project overview
-- [v2.1 Release Notes](RELEASES/v2.1.0/release_notes.md) - Complete changelog
-- [v2.0 Release Notes](RELEASES/v2.0.0/release_notes.md) - Previous version changelog
+- [v2.2.0 Release Notes](RELEASES/v2.2.0/release_notes.md) - Latest changelog
+- [v2.1.0 Release Notes](RELEASES/v2.1.0/release_notes.md) - Previous changelog
 
 ### Hardware Guides
 - [Waveshare 1.69" Touch LCD Datasheet](https://www.waveshare.com/wiki/1.69inch_Touch_LCD)
@@ -520,5 +523,6 @@ We are deeply grateful for kot149's detailed documentation and exploration of to
 ---
 
 **Version History**:
+- **v2.2.0** (2026-04): NVS persistence, Prospector Display layouts, Quick Actions version display, stability fixes
 - **v2.1.0** (2026-01): Zephyr 4.x compatibility, Keyboard List with channel filter, Layer Slide Mode, Pong Wars
 - **v2.0.0** (2025-11-20): Initial touch mode with Display Settings screen
