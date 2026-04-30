@@ -1,52 +1,41 @@
 # Prospector Scanner - ZMK Status Display Device
 
-> **v2.2b (February 2026) - Beta Release**
->
-> **🎨 NEW LAYOUTS**: Operator / Radii / Field display layouts (inspired by [carrefinho](https://github.com/carrefinho/prospector-zmk-module))
->
-> **🔧 BLE ADV REBUILD**: 3-mode Hybrid ADV (Piggyback / Non-connectable / Connectable Proxy)
->
-> **🔑 HWINFO KEYBOARD ID**: Hardware-unique ID prevents duplicate keyboard entries on profile switch
->
-> **💾 NVS PERSISTENCE**: Settings (channel, brightness, layout) survive reboot
->
-> **⚙️ NON-TOUCH LAYOUT**: `CONFIG_PROSPECTOR_DEFAULT_LAYOUT` for startup layout selection without touch
->
-> ⚠️ **Beta**: Testing release. For stable, use `v2.1.0`. Compatible with both Zephyr 4.x and 3.x.
-
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v2.2b-orange" alt="Version 2.2b">
-  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta">
+  <img src="https://img.shields.io/badge/version-v2.2.0-green" alt="Version 2.2.0">
   <img src="https://img.shields.io/badge/ZMK-compatible-blue" alt="ZMK Compatible">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
 </p>
 
-**Latest stable**: [v2.1.0 Release Notes](docs/RELEASES/v2.1.0/release_notes.md)
+**Latest release**: [v2.2.0 Release Notes](docs/RELEASES/v2.2.0/release_notes.md) | [All releases](https://github.com/t-ogura/zmk-config-prospector/releases)
 
-### Changes from v2.1.0
-
-**Bug Fixes**:
-- Keyboard ID collision fix (HWINFO-based hardware-unique ID)
-- Kconfig FADE_STEPS duplicate / MIPI_DBI type missing
-- I2C0 overlay conflict (moved to shield-level)
-- Keyboard name stuck/flicker/same-name collision on scanner
+### What's New in v2.2.0 (from v2.1.0)
 
 **New Features**:
-- 3 new display layouts: Operator, Radii, Field
-- NVS settings persistence (channel, brightness, layout)
-- `CONFIG_PROSPECTOR_DEFAULT_LAYOUT` for non-touch startup layout
-- 3-battery bar display (auto-switch from arc when 3+ peripherals)
-- Layer name 4 chars (was 3)
+- 3 new display layouts: Operator, Radii, Field (inspired by [carrefinho](https://github.com/carrefinho/prospector-zmk-module))
+- NVS settings persistence (channel, brightness, layout survive reboot)
+- Version protocol: keyboard firmware version displayed on scanner Quick Actions screen
+- Boot burst for immediate scanner detection on keyboard startup
+- High-priority change detection: layer/modifier/profile changes update instantly, WPM/battery at 1Hz
+- `CONFIG_PROSPECTOR_DEFAULT_LAYOUT` for non-touch startup layout selection
+- 3-battery bar display (Operator layout auto-switches from arc when 3+ peripherals)
 
-**BLE ADV**:
-- 3-mode Hybrid: Piggyback (disconnected) / Non-connectable (connected) / Connectable Proxy (profile switch)
-- Activity-based intervals, scannable MODE 2, optional KEYBOARD_NAME override
+**Stability & BLE**:
+- Scanner freeze fix: mutex + work handler architecture with lock-free BT RX ring buffer
+- 3-mode Hybrid ADV: Piggyback / Non-connectable / Connectable Proxy
+- Burst on layer, modifier, and profile changes (5×15ms) for reliable delivery
+- Activity-based intervals: 1Hz when typing, configurable idle interval
+
+**Compatibility**:
+- Keyboard firmware: ZMK main (Zephyr 4.x) and ZMK 0.3 (Zephyr 3.5) both supported
+- Scanner firmware: ZMK main required
+- GitHub Actions: updated for ZMK board variant (`xiao_ble/nrf52840/zmk`)
 
 **Keyboard-side `west.yml`**:
 ```yaml
 - name: prospector-zmk-module
   remote: prospector
-  revision: v2.2b  # Beta (use v2.1.0 for stable)
+  revision: v2.2.0
+  path: modules/prospector-zmk-module
 ```
 
 ---
@@ -135,7 +124,7 @@ See [Touch Mode Guide](docs/TOUCH_MODE.md) for touch configuration.
 ### Why Use It?
 
 - ✅ **See Everything**: Battery, layer, modifiers, WPM, signal strength
-- ✅ **Multi-Keyboard**: Monitor up to 5 keyboards simultaneously
+- ✅ **Multi-Keyboard**: Monitor multiple keyboards simultaneously
 - ✅ **Zero Connection Cost**: Uses BLE advertisements (observer mode)
 - ✅ **Professional UI**: YADS-style widget layout with NerdFont icons
 - ✅ **Split Keyboard Support**: Shows both left/right side information
@@ -151,7 +140,7 @@ See [Touch Mode Guide](docs/TOUCH_MODE.md) for touch configuration.
 - **NerdFont Icons**: Professional modifier key indicators (󰘴 Ctrl, 󰘵 Shift, 󰘶 Alt,  GUI)
 
 ### 🔋 **Smart Power Management** (v2.0 Enhanced)
-- **Activity-Based Intervals**: 10Hz (100ms) when typing, 0.03Hz (30s) when idle for maximum battery efficiency
+- **Activity-Based Intervals**: 1Hz (1000ms) when typing, low frequency when idle for maximum battery efficiency
 - **Automatic Transitions**: Seamless switching between active/idle states with configurable timeouts
 - **WPM-Aware Updates**: Higher frequency during active typing sessions with decay algorithm
 - **Scanner Battery Support**: Real-time battery monitoring for scanner device with charging indicator
@@ -161,14 +150,14 @@ See [Touch Mode Guide](docs/TOUCH_MODE.md) for touch configuration.
 ### 🎮 **Universal Compatibility**
 - **Any ZMK Keyboard**: Works with split, unibody, or any ZMK-compatible device
 - **Non-Intrusive**: Keyboards maintain full 5-device connectivity
-- **Multi-Keyboard**: Monitor up to 5 keyboards simultaneously with channel isolation
+- **Multi-Keyboard**: Monitor multiple keyboards simultaneously with channel isolation
 - **No Pairing Required**: Uses BLE advertisements (observer mode) - no connection slot consumed
 
 ### 🎯 **Touch Panel Support** (v2.0 New)
 - **Optional CST816S Touch**: Enable with `CONFIG_PROSPECTOR_TOUCH_ENABLED=y`
 - **4-Direction Swipe Gestures**: Navigate settings screens intuitively
 - **On-Device Settings**: Adjust max layers, channel filter, and more via touch
-- **Thread-Safe LVGL**: Complete freeze elimination with mutex protection
+- **Thread-Safe LVGL**: Freeze prevention with mutex + work handler architecture
 
 👉 **[Touch Mode Guide →](docs/TOUCH_MODE.md)** for complete setup and screen descriptions
 
@@ -345,7 +334,7 @@ manifest:
     # Add this:
     - name: prospector-zmk-module
       remote: prospector
-      revision: v2.2b  # Beta (v2.1.0 for stable)
+      revision: v2.2.0
       path: modules/prospector-zmk-module
 ```
 
@@ -372,7 +361,7 @@ west build -b your_board -- -DSHIELD=your_shield
 
 1. Power on scanner (should show "Waiting for keyboards...")
 2. Power on keyboard
-3. Scanner should detect keyboard within 1-2 seconds
+3. Scanner should detect keyboard within a few seconds
 4. Check display shows: device name, layer, battery, etc.
 
 **Success!** Your scanner is working.
@@ -483,9 +472,8 @@ Configuration file: `config/prospector_scanner.conf`
 # Enable scanner mode
 CONFIG_PROSPECTOR_MODE_SCANNER=y
 
-# Multi-keyboard support
+# Multi-keyboard support (enabled by default)
 CONFIG_PROSPECTOR_MULTI_KEYBOARD=y
-CONFIG_PROSPECTOR_MAX_KEYBOARDS=5     # Monitor up to 5 keyboards
 ```
 
 #### Display & LVGL
@@ -679,7 +667,6 @@ CONFIG_LOG_DEFAULT_LEVEL=4
 # ===== SCANNER MODE =====
 CONFIG_PROSPECTOR_MODE_SCANNER=y
 CONFIG_PROSPECTOR_MULTI_KEYBOARD=y
-CONFIG_PROSPECTOR_MAX_KEYBOARDS=5
 
 # ===== DISPLAY =====
 CONFIG_ZMK_DISPLAY=y
@@ -737,7 +724,7 @@ Copy this template and customize for your needs.
 ┌─────────────┐    BLE Adv     ┌──────────────┐
 │   Keyboard  │ ──────────────→│   Scanner    │
 │             │    26-byte     │   Display    │
-│ (10Hz/0.03Hz)│   Protocol    │  (USB/Battery)│
+│ (1Hz/idle)  │    Protocol    │  (USB/Battery)│
 └─────────────┘                └──────────────┘
        │
        ├── Device 1 (PC)
@@ -767,8 +754,9 @@ Keyboard                           Scanner
     │   advertisement payload
     │
     └─→ Broadcast BLE Adv ─────→  [BLE Observer Mode]
-        (100ms interval when           │
-         typing, 30s when idle)        ├─→ Parse advertisement
+        (1Hz when typing,              │
+         30s when idle,                ├─→ Parse advertisement
+         burst on changes)
                                        │   (battery, layer, etc.)
                                        │
                                        ├─→ Update LVGL widgets
@@ -791,33 +779,50 @@ The keyboard broadcasts its status using a custom BLE Advertisement payload. Sca
 |--------|-------|------|-------------|---------|
 | 0-1 | Manufacturer ID | 2 bytes | `0xFF 0xFF` (Custom/Local use) | `FF FF` |
 | 2-3 | Service UUID | 2 bytes | `0xAB 0xCD` (Prospector Protocol ID) | `AB CD` |
-| 4 | Protocol Version | 1 byte | Protocol version (current: `0x01`) | `01` |
+| 4 | Version | 1 byte | `[7:4]`=module major, `[3:0]`=module minor | `22` (v2.2) |
 | 5 | Battery Level | 1 byte | Main battery 0-100% (Central for split) | `5A` (90%) |
 | 6 | Active Layer | 1 byte | Current layer 0-15 | `02` (Layer 2) |
-| 7 | Profile Slot | 1 byte | BLE profile 0-4 | `01` (Profile 1) |
+| 7 | Profile Slot | 1 byte | `[6]`=dev flag, `[5:3]`=patch, `[2:0]`=profile 0-4 | `01` (Profile 1, v*.*.0 release) |
 | 8 | Connection Count | 1 byte | Number of connected BLE devices 0-5 | `03` (3 devices) |
-| 9 | Status Flags | 1 byte | USB/BLE/Charging/Caps Lock bits | `05` (USB+Caps) |
+| 9 | Status Flags | 1 byte | Caps/Charging/USB/BLE status bits | `18` (USB+BLE) |
 | 10 | Device Role | 1 byte | `0`=Standalone, `1`=Central, `2`=Peripheral | `01` (Central) |
 | 11 | Device Index | 1 byte | Split keyboard index (0=left, 1=right) | `00` |
 | 12-14 | Peripheral Batteries | 3 bytes | Left/Right/Aux battery levels 0-100% | `52 00 00` (82%, none, none) |
 | 15-18 | Layer Name | 4 bytes | ASCII layer identifier (optional) | `4C30...` ("L0") |
-| 19-22 | Keyboard ID | 4 bytes | Hash of keyboard name for multi-device | `12345678` |
-| 23 | Modifier Flags | 1 byte | L/R Ctrl,Shift,Alt,GUI states | `05` (LCtrl+LShift) |
+| 19-22 | Keyboard ID | 4 bytes | Hardware-unique ID (HWINFO) | `12345678` |
+| 23 | Modifier Flags | 1 byte | L/R Ctrl,Shift,Alt,GUI states | `05` (LCtrl+LAlt) |
 | 24 | WPM Value | 1 byte | Words per minute 0-255 | `3C` (60 WPM) |
-| 25 | Reserved | 1 byte | Future expansion | `00` |
+| 25 | Channel | 1 byte | Channel number 0-255 (0=broadcast to all) | `06` (Channel 6) |
+
+### Version Encoding (Offset 4, v2.2.0+)
+
+```
+Version byte:       [7:4] = module major (0-15)
+                    [3:0] = module minor (0-15)
+
+Profile Slot byte:  [6]   = dev flag (0=release, 1=dev)
+                    [5:3] = patch version (0-7)
+                    [2:0] = BLE profile slot (0-4)
+
+Example: v2.2.0 release, profile 1
+  version = 0x22, profile_slot = 0x01
+
+Backward compatible: v2.1.0 and earlier send version=0x01 (protocol v1).
+Scanner detects major=0 and displays "< v2.2".
+```
 
 ### Status Flags (Offset 9)
 
 ```
 Bit 7 6 5 4 3 2 1 0
-    │ │ │ │ │ │ │ └─ USB Connected (1=yes, 0=no)
-    │ │ │ │ │ │ └─── BLE Active (1=yes, 0=no)
-    │ │ │ │ │ └───── Charging (1=yes, 0=no)
-    │ │ │ │ └─────── Caps Lock (1=on, 0=off)
-    │ │ │ └───────── Reserved
-    │ │ └─────────── Reserved
-    │ └───────────── Reserved
-    └─────────────── Reserved
+    │ │ │ │ │ │ │ └─ Caps Word (1=active, 0=inactive)
+    │ │ │ │ │ │ └─── Charging (1=yes, 0=no)
+    │ │ │ │ │ └───── USB Connected (1=yes, 0=no)
+    │ │ │ │ └─────── USB HID Ready (1=yes, 0=no)
+    │ │ │ └───────── BLE Connected (1=yes, 0=no)
+    │ │ └─────────── BLE Bonded (1=yes, 0=no)
+    │ └───────────── Reserved (protocol version, future)
+    └─────────────── Reserved (protocol version, future)
 ```
 
 ### Modifier Flags (Offset 23)
@@ -838,14 +843,15 @@ Bit 7 6 5 4 3 2 1 0
 
 The keyboard adjusts broadcast frequency based on activity to save battery:
 
-- **Active Mode** (typing detected): 100ms interval (10 Hz)
+- **Active Mode** (typing detected): 1000ms interval (1 Hz, configurable)
   - Triggered by any keypress
-  - Provides real-time WPM and layer updates
+  - Provides periodic WPM and battery updates
+  - Layer/modifier/profile changes trigger immediate burst (5×15ms)
 
-- **Idle Mode** (no typing): 30000ms interval (0.03 Hz)
-  - Activated after 10 seconds of no keypresses
+- **Idle Mode** (no typing): 30000ms interval (configurable)
+  - Activated after 5 seconds of no keypresses (configurable)
   - Battery-friendly for long idle periods
-  - Still broadcasts status for monitoring
+  - Layer changes still trigger burst for immediate response
 
 ---
 
@@ -908,13 +914,13 @@ manifest:
     # Add this:
     - name: prospector-zmk-module
       remote: prospector
-      revision: v2.2b  # Beta (v2.1.0 for stable)
+      revision: v2.2.0
       path: modules/prospector-zmk-module
 ```
 
-> ⚠️ **ZMK version compatibility**:
-> - `v2.2b` (beta) / `v2.1.0` (stable): Zephyr 4.x and 3.x both supported
-> - `v2.0.0`: Zephyr 3.x only
+> **ZMK version compatibility**:
+> - `v2.2.0`: Keyboard-side supports both Zephyr 4.x and 3.x. Scanner requires Zephyr 4.x.
+> - `v2.0.0` / `v2.1.0`: Zephyr 3.x only
 
 ### Step 2: Enable Status Advertisement
 
@@ -939,9 +945,9 @@ CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME="MyKeyboard"  # Shown on scanner (max 8 char
 
 # ===== POWER OPTIMIZATION (all have sensible defaults) =====
 # CONFIG_ZMK_STATUS_ADV_ACTIVITY_BASED=y          # Default: y (enabled)
-# CONFIG_ZMK_STATUS_ADV_ACTIVE_INTERVAL_MS=200    # Default: 200 (5Hz when typing)
-# CONFIG_ZMK_STATUS_ADV_IDLE_INTERVAL_MS=30000    # Default: 30000 (0.03Hz when idle)
-# CONFIG_ZMK_STATUS_ADV_ACTIVITY_TIMEOUT_MS=10000 # Default: 10000 (10s before idle)
+# CONFIG_ZMK_STATUS_ADV_ACTIVE_INTERVAL_MS=1000   # Default: 200 (recommended: 1000 = 1Hz)
+# CONFIG_ZMK_STATUS_ADV_IDLE_INTERVAL_MS=30000    # Default: 30000 (30s when idle)
+# CONFIG_ZMK_STATUS_ADV_ACTIVITY_TIMEOUT_MS=5000  # Default: 5000 (5s before idle)
 
 # ===== SPLIT KEYBOARD =====
 CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING=y  # Fetch peripheral battery
@@ -988,7 +994,7 @@ west build -b your_board -- -DSHIELD=your_shield
 - **[Touch Mode Guide](docs/TOUCH_MODE.md)** - Touch panel setup, screen navigation, UI element descriptions
 
 ### Release History
-- **v2.2b** (2026-02): Beta - New layouts, BLE ADV rebuild, HWINFO keyboard ID, NVS persistence
+- **[v2.2.0](docs/RELEASES/v2.2.0/release_notes.md)** (2026-04): New layouts, BLE ADV rebuild, version protocol, stability improvements
 - **[v2.1.0](docs/RELEASES/v2.1.0/release_notes.md)** (2026-01): Zephyr 4.x, improved responsiveness, layer slide mode
 - **[v2.0.0](docs/RELEASES/v2.0.0/release_notes.md)** (2025-11): Touch support, USB display fix, thread safety
 - **v1.1.x** (2025-08): Ambient light sensor, power optimization
@@ -1059,9 +1065,7 @@ west build -b your_board -- -DSHIELD=your_shield
 
 **Problem**: Display stops updating, becomes unresponsive.
 
-**This is a known issue in v1.x** - **Fixed in v2.0** with LVGL mutex protection.
-
-**Solution**: Upgrade to v2.0 firmware.
+**Solution**: Upgrade to v2.2.0 firmware. This version uses mutex + work handler architecture with data processing separated from display rendering, preventing LVGL thread-safety issues.
 
 ### Battery Widget Not Showing
 
@@ -1080,13 +1084,7 @@ west build -b your_board -- -DSHIELD=your_shield
 
 ### Building Custom Keyboard List
 
-Scanner can monitor up to 5 keyboards. Configure in `prospector_scanner.conf`:
-
-```conf
-CONFIG_PROSPECTOR_MAX_KEYBOARDS=5  # Increase if needed (max: 5)
-```
-
-Display automatically shows keyboards that broadcast status. No pairing needed.
+Scanner can monitor multiple keyboards simultaneously. Display automatically shows keyboards that broadcast status. No pairing needed.
 
 ### WPM Calculation Windows
 
@@ -1130,9 +1128,7 @@ Shows technical information overlaid on screen. **Disable for production** (`=n`
 
 ## Roadmap
 
-### v2.2.0 - Stable Release (Planned)
-
-v2.2b is currently in beta testing. After testing is complete, a stable v2.2.0 release will be published.
+Future development may include Periodic Advertising (v2 protocol) for improved power efficiency. See [CLAUDE.md](CLAUDE.md) for technical design notes.
 
 ---
 
@@ -1189,4 +1185,4 @@ For major changes, please open an issue first to discuss what you would like to 
 
 **Questions?** Open an [issue](https://github.com/t-ogura/zmk-config-prospector/issues) or join [ZMK Discord](https://zmk.dev/community/discord/invite).
 
-**Prospector Scanner v2.2b** - ZMK Status Display Device
+**Prospector Scanner v2.2.0** - ZMK Status Display Device
